@@ -1,19 +1,19 @@
-import { Button, Grid, MenuItem, TextField, Autocomplete } from "@mui/material";
+import { Autocomplete, Button, Grid, MenuItem, TextField } from "@mui/material";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Divider from "@mui/material/Divider";
+import FormControl from "@mui/material/FormControl";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputLabel from "@mui/material/InputLabel";
+import OutlinedInput from "@mui/material/OutlinedInput";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import InputAdornment from "@mui/material/InputAdornment";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
 import dayjs from "dayjs";
 import { MuiTelInput } from "mui-tel-input";
 import PropTypes from "prop-types";
@@ -21,7 +21,6 @@ import * as React from "react";
 
 import axios from "axios";
 
-import FotoEmpleado from "./FotoEmpleado";
 
 import {
   Dialog,
@@ -30,8 +29,8 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import { es } from "days";
 import { esES } from "@mui/x-date-pickers/locales";
+import { es } from "days";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -305,7 +304,7 @@ export default function Empleado({ open }) {
               <Grid item xs={12} md={6}>
                 <div>
                   <Grid container spacing={2}>
-                    <FotoEmpleado handleFoto={handleFoto} />
+                   
                   </Grid>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>

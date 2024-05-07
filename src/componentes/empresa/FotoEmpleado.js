@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 import {
   Avatar,
   Box,
@@ -10,16 +9,13 @@ import {
   DialogActions,
 } from "@mui/material";
 import { Menu, MenuItem } from "@mui/material";
-=======
 import { Avatar, Box, Button, Dialog } from "@mui/material";
 import Fade from '@mui/material/Fade';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
->>>>>>> Stashed changes
 import React, { useState } from "react";
 import Webcam from "react-webcam";
 
-<<<<<<< Updated upstream
 function FotoEmpleado(props) {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -34,7 +30,6 @@ function FotoEmpleado(props) {
     props.handleFoto(imageSrc);
   }, [webcamRef, setImgSrc]);
 
-=======
 function FotoEmpleado() {
   const [photo, setPhoto]       = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
@@ -44,7 +39,7 @@ function FotoEmpleado() {
     setOpenV(false);
   }
   const open = Boolean(anchorEl);
->>>>>>> Stashed changes
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -88,11 +83,9 @@ function FotoEmpleado() {
   };
 
   return (
-<<<<<<< Updated upstream
     <React.Fragment>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2, p: 2 }}>
         <Avatar alt="Foto del empleado" src={imgSrc}  sx={{ width: 100, height: 100 }} />
-=======
     <>
     <Box sx={{ display: "flex", alignItems: "center", gap: 2, p: 2 }}>
       <Avatar
@@ -108,7 +101,6 @@ function FotoEmpleado() {
           type="file"
           onChange={handlePhotoChange}
         />
->>>>>>> Stashed changes
         <Button
           aria-controls="simple-menu"
           aria-haspopup="true"
@@ -123,7 +115,6 @@ function FotoEmpleado() {
           open={mopen}
           onClose={handleClose}
         >
-<<<<<<< Updated upstream
         <input
         type="file"
         accept="image/*"
@@ -166,18 +157,9 @@ function FotoEmpleado() {
           <Button onClick={handleCloseDialog}>Guardar foto</Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
-=======
-          <MenuItem onClick={() => setOpenV(true)}>Tomar foto desde WEBCAM</MenuItem>
-          <MenuItem onClick={handleClose}>Subir una imagen</MenuItem>          
-        </Menu>
-      </label>
-    </Box>
-    <Dialog open={openV} onClose={closeV} aria-labelledby="">
-      
-    </Dialog>
     </>
->>>>>>> Stashed changes
+    </Box>
+    </React.Fragment>
   );
 }
 
