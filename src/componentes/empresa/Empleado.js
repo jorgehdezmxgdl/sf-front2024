@@ -21,7 +21,6 @@ import * as React from "react";
 
 import axios from "axios";
 
-
 import {
   Dialog,
   DialogActions,
@@ -32,6 +31,7 @@ import {
 import { esES } from "@mui/x-date-pickers/locales";
 import { es } from "days";
 
+const curp = require("curp");
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -105,7 +105,7 @@ export default function Empleado({ open }) {
     nombre: "",
     apellido_paterno: "",
     apellido_materno: "",
-    fecha_nacimiento: dayjs("1990-01-01"),
+    fecha_nacimiento: dayjs("1990-06-01"),
     genero: "",
     curp: "",
     numero_ss: "",
@@ -129,6 +129,10 @@ export default function Empleado({ open }) {
     puesto: "",
     jefe: "",
     salario: "",
+    nombre_usuario: "",
+    contrasena: "",
+    contrasena2: "",
+    tiempo_innactivo: "1",
     fecha_ingreso: dayjs(),
     departamento: "1",
     puesto: "1",
@@ -161,6 +165,31 @@ export default function Empleado({ open }) {
       const campos = Object.keys(formValues);
       console.log(campos);
     }
+  };
+
+  const handleCURP = (e) => {
+    let persona = curp.getPersona();
+    const {
+      nombre,
+      apellido_paterno,
+      apellido_materno,
+      genero,
+      fecha_nacimiento,
+    } = formValues;
+    persona.nombre = nombre;
+    persona.apellidoPaterno = apellido_paterno;
+    persona.apellidoMaterno = apellido_materno;
+    persona.genero =
+      genero === "M" ? curp.GENERO.MASCULINO : curp.GENERO.FEMENINO;
+    const mFecha = dayjs(fecha_nacimiento).format("DD-MM-YYYY").toString();
+    persona.fechaNacimiento = mFecha;
+    persona.estado = curp.ESTADO.JALISCO;
+    const curpGenerada = curp.generar(persona);
+    setFormValues({
+      ...formValues,
+      curp: curpGenerada,
+      rfc: curpGenerada.substring(0, 10),
+    });
   };
 
   React.useEffect(() => {
@@ -303,9 +332,7 @@ export default function Empleado({ open }) {
             <CustomTabPanel value={value} index={0}>
               <Grid item xs={12} md={6}>
                 <div>
-                  <Grid container spacing={2}>
-                   
-                  </Grid>
+                  <Grid container spacing={2}></Grid>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
                       <TextField
@@ -328,6 +355,7 @@ export default function Empleado({ open }) {
                             setFormErrors({ ...formErrors, nombre: "" });
                           }
                         }}
+                        inputProps={{ style: { textTransform: "uppercase" } }}
                         error={!!formErrors.nombre}
                         helperText={formErrors.nombre || ""}
                       />
@@ -356,6 +384,7 @@ export default function Empleado({ open }) {
                             });
                           }
                         }}
+                        inputProps={{ style: { textTransform: "uppercase" } }}
                         error={!!formErrors.apellido_paterno}
                         helperText={formErrors.apellido_paterno || ""}
                       />
@@ -384,6 +413,7 @@ export default function Empleado({ open }) {
                             });
                           }
                         }}
+                        inputProps={{ style: { textTransform: "uppercase" } }}
                         error={!!formErrors.apellido_materno}
                         helperText={formErrors.apellido_materno || ""}
                       />
@@ -440,6 +470,7 @@ export default function Empleado({ open }) {
                         }}
                         InputProps={{
                           readOnly: true,
+                          style: { textTransform: "uppercase" },
                         }}
                         value={dayjs().diff(
                           formValues.fecha_nacimiento,
@@ -472,6 +503,10 @@ export default function Empleado({ open }) {
                             });
                           }
                         }}
+                        inputProps={{ style: { textTransform: "uppercase" } }}
+                        onBlur={(e) => {
+                          handleCURP(e);
+                        }}
                         error={!!formErrors.genero}
                         helperText={formErrors.genero || ""}
                       >
@@ -486,10 +521,12 @@ export default function Empleado({ open }) {
                         label="Estado Civil"
                         select
                         fullWidth
+                        value={formValues.estado_civil}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
+                        inputProps={{ style: { textTransform: "uppercase" } }}
                         onChange={(e) => {
                           setFormValues({
                             ...formValues,
@@ -521,10 +558,12 @@ export default function Empleado({ open }) {
                         label="Tipo de Sangre"
                         select
                         fullWidth
+                        value={formValues.tipo_sangre}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
+                        inputProps={{ style: { textTransform: "uppercase" } }}
                         onChange={(e) => {
                           setFormValues({
                             ...formValues,
@@ -558,7 +597,9 @@ export default function Empleado({ open }) {
                       <TextField
                         label="Número de Seguro Social"
                         fullWidth
+                        type="number"
                         margin="normal"
+                        value={formValues.numero_ss}
                         InputLabelProps={{
                           shrink: true,
                         }}
@@ -576,6 +617,9 @@ export default function Empleado({ open }) {
                               numero_ss: "",
                             });
                           }
+                          if (e.target.value.length > 11) {
+                            alert("Please enter");
+                          }
                         }}
                         error={!!formErrors.numero_ss}
                         helperText={formErrors.numero_ss || ""}
@@ -589,6 +633,11 @@ export default function Empleado({ open }) {
                         InputLabelProps={{
                           shrink: true,
                         }}
+                        inputProps={{
+                          style: { textTransform: "uppercase" },
+                          maxLength: 18,
+                        }}
+                        value={formValues.curp}
                         onChange={(e) => {
                           setFormValues({
                             ...formValues,
@@ -610,8 +659,13 @@ export default function Empleado({ open }) {
                         label="RFC"
                         fullWidth
                         margin="normal"
+                        value={formValues.rfc}
                         InputLabelProps={{
                           shrink: true,
+                        }}
+                        inputProps={{
+                          style: { textTransform: "uppercase" },
+                          maxLength: 13,
                         }}
                         onChange={(e) => {
                           setFormValues({
@@ -634,10 +688,12 @@ export default function Empleado({ open }) {
                         label="Correo electrónico"
                         type="email"
                         fullWidth
+                        value={formValues.email}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
+                        inputProps={{ style: { textTransform: "lowercase" } }}
                         onChange={(e) => {
                           setFormValues({
                             ...formValues,
@@ -662,21 +718,16 @@ export default function Empleado({ open }) {
                         label="Teléfono de casa"
                         fullWidth
                         variant="outlined"
+                        value={telef_casa}
                         defaultCountry="MX"
                         onChange={(e) => {
                           setTelCasa(e);
-                          formValues.telef_casa = telef_casa;
-                          if (
-                            formErrors.telef_casa &&
-                            telef_casa.trim() !== ""
-                          ) {
-                            setFormErrors({ ...formErrors, telef_casa: "" });
-                          }
+                          setFormValues({
+                            ...formValues,
+                            telef_casa: telef_casa,
+                          });
                         }}
-                        value={formValues.telef_casa}
                         inputProps={{ maxLength: 16 }}
-                        error={!!formErrors.telef_casa}
-                        helperText={formErrors.telef_casa || ""}
                       />
                     </Grid>
                     <Grid item xs={6} sm={4}>
@@ -687,7 +738,10 @@ export default function Empleado({ open }) {
                         defaultCountry="MX"
                         onChange={(e) => {
                           setTelMovil(e);
-                          formValues.telef_mobile = telef_mobile;
+                          setFormValues({
+                            ...formValues,
+                            telef_mobile: telef_mobile,
+                          });
                           if (
                             formErrors.telef_mobile &&
                             telef_mobile.trim() !== ""
@@ -695,10 +749,8 @@ export default function Empleado({ open }) {
                             setFormErrors({ ...formErrors, telef_mobile: "" });
                           }
                         }}
-                        value={formValues.telef_mobile}
+                        value={telef_mobile}
                         inputProps={{ maxLength: 16 }}
-                        error={!!formErrors.telef_mobile}
-                        helperText={formErrors.telef_mobile || ""}
                       />
                     </Grid>
                   </Grid>
@@ -713,6 +765,7 @@ export default function Empleado({ open }) {
                   placeholder="Calle Venustiano Carranza #1234 esquina Miguel de Legaspi"
                   value={formValues.domicilio}
                   margin="normal"
+                  inputProps={{ style: { textTransform: "uppercase" } }}
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -728,6 +781,8 @@ export default function Empleado({ open }) {
                       });
                     }
                   }}
+                  error={!!formErrors.domicilio}
+                  helperText={formErrors.domicilio || ""}
                 />
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={4}>
@@ -900,6 +955,7 @@ export default function Empleado({ open }) {
                   label="Nombre del contacto de emergencia"
                   type="text"
                   fullWidth
+                  inputProps={{ style: { textTransform: "uppercase" } }}
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
@@ -915,6 +971,8 @@ export default function Empleado({ open }) {
                     }
                   }}
                   placeholder="Ej: José María López Hernández"
+                  error={!!formErrors.emergencia}
+                  helperText={formErrors.emergencia || ""}
                 />
               </Grid>
               <Grid item xs={6} sm={4}>
@@ -977,9 +1035,22 @@ export default function Empleado({ open }) {
                   label="Departamento"
                   select
                   fullWidth
+                  value={formValues.departamento}
                   margin="normal"
                   InputLabelProps={{
                     shrink: true,
+                  }}
+                  onChange={(e) => {
+                    setFormValues({
+                      ...formValues,
+                      departamento: e.target.value,
+                    });
+                    if (formErrors.departamento && e.target.value !== "") {
+                      setFormErrors({
+                        ...formErrors,
+                        departamento: "",
+                      });
+                    }
                   }}
                 >
                   {departamento.map((item, index) => (
@@ -987,95 +1058,149 @@ export default function Empleado({ open }) {
                       {item.nombre}
                     </MenuItem>
                   ))}
+                  error={!!formErrors.departamento}
+                  helperText={formErrors.departamento || ""}
                 </TextField>
+              </Grid>
+              <Grid item xs={6} sm={4}>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    label="Puesto"
+                    select
+                    fullWidth
+                    margin="normal"
+                    value={formValues.puesto}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        puesto: e.target.value,
+                      });
+                      if (formErrors.puesto && e.target.value !== "") {
+                        setFormErrors({
+                          ...formErrors,
+                          puesto: "",
+                        });
+                      }
+                    }}
+                  >
+                    {puesto.map((item, index) => (
+                      <MenuItem key={index} value={item.id}>
+                        {item.nombre}
+                      </MenuItem>
+                    ))}
+                    error={!!formErrors.puesto}
+                    helperText={formErrors.puesto || ""}
+                  </TextField>
                 </Grid>
                 <Grid item xs={6} sm={4}>
-                  <Grid item xs={6} sm={4}>
-                    <TextField
-                      label="Puesto"
-                      select
-                      fullWidth
-                      margin="normal"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    >
-                      {puesto.map((item, index) => (
-                        <MenuItem key={index} value={item.id}>
-                          {item.nombre}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={6} sm={4}>
-                    <TextField
-                      label="Jefe inmediato"
-                      select
-                      fullWidth
-                      margin="normal"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    >
-                      {puesto.map((item, index) => (
-                        <MenuItem key={index} value={item.id}>
-                          {item.nombre}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <p></p>
-                        <FormControl fullWidth>
-                          <InputLabel htmlFor="outlined-adornment-amount">
-                            Salario
-                          </InputLabel>
-                          <OutlinedInput
-                            id="outlined-adornment-amount"
-                            startAdornment={
-                              <InputAdornment position="start">
-                                $
-                              </InputAdornment>
+                  <TextField
+                    label="Jefe inmediato"
+                    select
+                    fullWidth
+                    value={formValues.jefe}
+                    margin="normal"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        jefe: e.target.value,
+                      });
+                      if (formErrors.jefe && e.target.value !== "") {
+                        setFormErrors({
+                          ...formErrors,
+                          jefe: "",
+                        });
+                      }
+                    }}
+                  >
+                    {puesto.map((item, index) => (
+                      <MenuItem key={index} value={item.id}>
+                        {item.nombre}
+                      </MenuItem>
+                    ))}
+                    error={!!formErrors.jefe}
+                    helperText={formErrors.jefe || ""}
+                  </TextField>
+                </Grid>
+                <Grid item xs={12}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <p></p>
+                      <FormControl fullWidth>
+                        <InputLabel htmlFor="outlined-adornment-amount">
+                          Salario
+                        </InputLabel>
+                        <OutlinedInput
+                          id="outlined-adornment-amount"
+                          startAdornment={
+                            <InputAdornment position="start">$</InputAdornment>
+                          }
+                          label="Salario"
+                          value={formValues.salario}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              salario: e.target.value,
+                            });
+                            if (formErrors.salario && e.target.value !== "") {
+                              setFormErrors({ ...formErrors, salario: "" });
                             }
-                            label="Salario"
-                          />
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <DemoContainer components={["DatePicker"]}>
-                          <LocalizationProvider
-                            dateAdapter={AdapterDayjs}
-                            adapterLocale={es}
-                            localeText={spanishLocale}
-                          >
-                            <DatePicker
-                              margin="normal"
-                              fullWidth
-                              sx={{ width: "100%" }}
-                              label="Fecha de ingreso"
-                              disableFuture
-                              onChange={(e) => {
-                                setFormValues({
-                                  ...formValues,
-                                  fecha_ingreso: dayjs(e),
+                          }}
+                          error={!!formErrors.salario}
+                          helperText={formErrors.salario || ""}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <DemoContainer components={["DatePicker"]}>
+                        <LocalizationProvider
+                          dateAdapter={AdapterDayjs}
+                          adapterLocale={es}
+                          localeText={spanishLocale}
+                        >
+                          <DatePicker
+                            margin="normal"
+                            fullWidth
+                            sx={{ width: "100%" }}
+                            label="Fecha de ingreso"
+                            value={formValues.fecha_ingreso}
+                            disableFuture
+                            onChange={(e) => {
+                              setFormValues({
+                                ...formValues,
+                                fecha_ingreso: dayjs(e).format("DD/MM/YYYY"),
+                              });
+                              if (
+                                formErrors.fecha_ingreso &&
+                                e.target.value !== ""
+                              ) {
+                                setFormErrors({
+                                  ...formErrors,
+                                  fecha_ingreso: "",
                                 });
-                              }}
-                              slotProps={{
-                                textField: {
-                                  helperText: `Antigüedad: ${dayjs().diff(
-                                    formValues.fecha_ingreso,
-                                    "year"
-                                  )} años`,
-                                },
-                              }}
-                            />
-                          </LocalizationProvider>
-                        </DemoContainer>
-                      </Grid>
+                              }
+                            }}
+                            slotProps={{
+                              textField: {
+                                helperText: `Antigüedad: ${dayjs().diff(
+                                  formValues.fecha_ingreso,
+                                  "year"
+                                )} años`,
+                              },
+                            }}
+                            error={!!formErrors.fecha_ingreso}
+                            helperText={formErrors.fecha_ingreso || ""}
+                          />
+                        </LocalizationProvider>
+                      </DemoContainer>
                     </Grid>
                   </Grid>
+                </Grid>
               </Grid>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={3}>
@@ -1088,6 +1213,24 @@ export default function Empleado({ open }) {
                     InputLabelProps={{
                       shrink: true,
                     }}
+                    value={formValues.nombre_usuario}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        nombre_usuario: e.target.value,
+                      });
+                      if (
+                        formErrors.nombre_usuario &&
+                        e.target.value.trim() !== ""
+                      ) {
+                        setFormErrors({
+                          ...formErrors,
+                          nombre_usuario: "",
+                        });
+                      }
+                    }}
+                    error={!!formErrors.nombre_usuario}
+                    helperText={formErrors.nombre_usuario || ""}
                   />
                 </Grid>
                 <Grid item xs={6}>
@@ -1099,6 +1242,24 @@ export default function Empleado({ open }) {
                     InputLabelProps={{
                       shrink: true,
                     }}
+                    value={formValues.contrasena}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        contrasena: e.target.value,
+                      });
+                      if (
+                        formErrors.contrasena &&
+                        e.target.value.trim() !== ""
+                      ) {
+                        setFormErrors({
+                          ...formErrors,
+                          contrasena: "",
+                        });
+                      }
+                    }}
+                    error={!!formErrors.contrasena}
+                    helperText={formErrors.contrasena || ""}
                   />
                 </Grid>
                 <Grid item xs={6}>
@@ -1110,7 +1271,46 @@ export default function Empleado({ open }) {
                     InputLabelProps={{
                       shrink: true,
                     }}
+                    value={formValues.contrasena2}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        contrasena2: e.target.value,
+                      });
+                      if (
+                        formErrors.contrasena2 &&
+                        e.target.value.trim() !== ""
+                      ) {
+                        setFormErrors({
+                          ...formErrors,
+                          contrasena2: "",
+                        });
+                      }
+                    }}
+                    error={!!formErrors.contrasena2}
+                    helperText={formErrors.contrasena2 || ""}
                   />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Rol"
+                    select
+                    fullWidth
+                    margin="normal"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  >
+                    <MenuItem label="Administrador" value="1">
+                      Administrador
+                    </MenuItem>
+                    <MenuItem label="Usuario" value="2">
+                      Usuario
+                    </MenuItem>
+                    <MenuItem label="Invitado" value="3">
+                      Invitado
+                    </MenuItem>
+                  </TextField>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -1126,6 +1326,24 @@ export default function Empleado({ open }) {
                     InputLabelProps={{
                       shrink: true,
                     }}
+                    value={formValues.tiempo_innactivo}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        tiempo_innactivo: e.target.value,
+                      });
+                      if (
+                        formErrors.tiempo_innactivo &&
+                        e.target.value.trim() !== ""
+                      ) {
+                        setFormErrors({
+                          ...formErrors,
+                          tiempo_innactivo: "",
+                        });
+                      }
+                    }}
+                    error={!!formErrors.tiempo_innactivo}
+                    helperText={formErrors.tiempo_innactivo || ""}
                   />
                 </Grid>
               </Grid>
