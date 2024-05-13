@@ -18,6 +18,8 @@ import dayjs from "dayjs";
 import { MuiTelInput } from "mui-tel-input";
 import PropTypes from "prop-types";
 import * as React from "react";
+import FotoEmpleado from "./FotoEmpleado";
+
 
 import axios from "axios";
 
@@ -332,7 +334,9 @@ export default function Empleado({ open }) {
             <CustomTabPanel value={value} index={0}>
               <Grid item xs={12} md={6}>
                 <div>
-                  <Grid container spacing={2}></Grid>
+                  <Grid container spacing={2}>
+                    <FotoEmpleado handleFoto={handleFoto} />
+                  </Grid>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
                       <TextField
