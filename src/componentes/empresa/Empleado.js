@@ -20,7 +20,6 @@ import PropTypes from "prop-types";
 import * as React from "react";
 import FotoEmpleado from "./FotoEmpleado";
 
-
 import axios from "axios";
 
 import {
@@ -66,14 +65,13 @@ function a11yProps(index) {
   };
 }
 
-export default function Empleado({ open }) {
+export default function Empleado(props) {
   const [value, setValue] = React.useState(0);
   const [telef_casa, setTelCasa] = React.useState("");
   const [telef_mobile, setTelMovil] = React.useState("");
   const [emergencia, setEmergencia] = React.useState("");
   const [inputValue, setInputValue] = React.useState("0");
   const [postalCodes, setPostalCodes] = React.useState([]);
-  const [openx, setOpenx] = React.useState(false);
   const [options, setOptions] = React.useState([]);
   const [estadosPais, setEstadosPais] = React.useState([]);
   const [departamento, setDepartamento] = React.useState([]);
@@ -88,6 +86,7 @@ export default function Empleado({ open }) {
 
   const handleFoto = (foto) => {
     setFoto(foto);
+    setFormValues({ ...formValues, imagen: foto });
   };
 
   const [entradaTiempo, setEntradaTiempo] = React.useState(
@@ -127,7 +126,7 @@ export default function Empleado({ open }) {
     municipio: "",
     colonia: "",
     pais: "MX",
-    departamento: "",
+    departamento: "1",
     puesto: "",
     jefe: "",
     salario: "",
@@ -136,8 +135,8 @@ export default function Empleado({ open }) {
     contrasena2: "",
     tiempo_innactivo: "1",
     fecha_ingreso: dayjs(),
-    departamento: "1",
-    puesto: "1",
+    activo: true,
+    edicion: true,
   });
 
   const [formErrors, setFormErrors] = React.useState({});
@@ -153,6 +152,47 @@ export default function Empleado({ open }) {
     return camposVacios;
   }
 
+  const initializeForm = () => {
+    setFormValues({
+      ...formValues,
+      nombre: "",
+      apellido_paterno: "",
+      apellido_materno: "",
+      fecha_nacimiento: dayjs("1990-06-01"),
+      genero: "",
+      curp: "",
+      numero_ss: "",
+      rfc: "",
+      imagen: "",
+      email: "",
+      telef_casa: "",
+      telef_mobile: "",
+      emergencia: "",
+      telef_emergencia: "",
+      estado_civil: "",
+      tipo_sangre: "",
+      domicilio: "",
+      observaciones: "",
+      codigo_postal: "",
+      estadosPais: "14",
+      municipio: "",
+      colonia: "",
+      pais: "MX",
+      departamento: "1",
+      puesto: "",
+      jefe: "",
+      salario: "",
+      nombre_usuario: "",
+      contrasena: "",
+      contrasena2: "",
+      tiempo_innactivo: "1",
+      fecha_ingreso: dayjs(),
+      activo: true,
+      edicion: true,
+    });
+    setFormErrors({});
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const errores = {};
@@ -164,10 +204,15 @@ export default function Empleado({ open }) {
       });
       setFormErrors(errores);
     } else {
-      const campos = Object.keys(formValues);
-      console.log(campos);
+      insertEmployee();
+      initializeForm();
     }
   };
+
+  const insertEmployee = async () => {
+    const response = await axios.post('http://localhost:5784/empleados', formValues);
+    console.log(response);
+  }
 
   const handleCURP = (e) => {
     let persona = curp.getPersona();
@@ -266,7 +311,7 @@ export default function Empleado({ open }) {
 
   return (
     <Dialog
-      open={open}
+      open={props.open}
       maxWidth={"md"}
       PaperProps={{
         component: "form",
@@ -836,10 +881,7 @@ export default function Empleado({ open }) {
                           ...formValues,
                           colonia: e.target.value,
                         });
-                        if (
-                          formErrors.colonia &&
-                          e.target.value.trim() !== ""
-                        ) {
+                        if (formErrors.colonia && e.target.value !== "") {
                           setFormErrors({
                             ...formErrors,
                             colonia: "",
@@ -872,10 +914,7 @@ export default function Empleado({ open }) {
                           ...formValues,
                           municipio: e.target.value,
                         });
-                        if (
-                          formErrors.municipio &&
-                          e.target.value.trim() !== ""
-                        ) {
+                        if (formErrors.municipio && e.target.value !== "") {
                           setFormErrors({
                             ...formErrors,
                             municipio: "",
@@ -910,10 +949,7 @@ export default function Empleado({ open }) {
                           ...formValues,
                           estadosPais: e.target.value,
                         });
-                        if (
-                          formErrors.estadosPais &&
-                          e.target.value.trim() !== ""
-                        ) {
+                        if (formErrors.estadosPais && e.target.value !== "") {
                           setFormErrors({
                             ...formErrors,
                             estadosPais: "",
@@ -1418,7 +1454,7 @@ export default function Empleado({ open }) {
         </form>
       </DialogContent>
       <DialogActions>
-        <Button>Cerrar</Button>
+        <Button onClick={props.handleClose}>Cerrar</Button>
         <Button
           type="submit"
           onClick={handleSubmit}
