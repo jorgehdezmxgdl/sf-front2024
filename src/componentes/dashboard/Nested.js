@@ -5,7 +5,6 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
-import DraftsIcon from '@mui/icons-material/Drafts';
 import SendIcon from '@mui/icons-material/Send';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -23,6 +22,7 @@ import StackedLineChartIcon from '@mui/icons-material/StackedLineChart';
 import BusinessIcon from '@mui/icons-material/Business';
 import FaceIcon from '@mui/icons-material/Face';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
+import DoorFrontIcon from '@mui/icons-material/DoorFront';
 
 export default function Nested(props) {
   const [show, setShow]     = React.useState(0);
@@ -55,22 +55,10 @@ export default function Nested(props) {
       aria-labelledby="nested-list-subheader"
       subheader={
         <ListSubheader component="div" id="nested-list-subheader">
-          Nested List Items
+          Menú Principal
         </ListSubheader>
       }
     >
-      <ListItemButton>
-        <ListItemIcon>
-          <SendIcon />
-        </ListItemIcon>
-        <ListItemText primary="Compras" />
-      </ListItemButton>
-      <ListItemButton>
-        <ListItemIcon>
-          <DraftsIcon />
-        </ListItemIcon>
-        <ListItemText primary="Drafts" />
-      </ListItemButton>
       <ListItemButton onClick={handleClickCompras}>
         <ListItemIcon>
           <StorefrontIcon />
@@ -169,6 +157,12 @@ export default function Nested(props) {
           </ListItemButton>
         </List>     
       </Collapse>
+      <ListItemButton>
+        <ListItemIcon>
+          <DoorFrontIcon />
+        </ListItemIcon>
+        <ListItemText primary="Salir" />
+      </ListItemButton>
     </List>
     
   );
