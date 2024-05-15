@@ -88,7 +88,6 @@ export default function FotoEmpleado(props) {
               aria-haspopup="true"
               onClick={handleClick}
             >
-              Abrir Menú
             </Button>
             <Menu
               id="simple-menu"
