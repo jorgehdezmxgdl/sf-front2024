@@ -229,7 +229,6 @@ export default function Empleado(props) {
     console.log(formValues);
     try {
       const response = await axios.post('http://localhost:5784/empleados', formValues);
-      console.log(response);
     } catch(error) {
       if (error.response) {
         // Asegúrate de que el mensaje de error es un string

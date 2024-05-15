@@ -10,6 +10,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import MailIcon from "@mui/icons-material/Mail";
+import ListSubheader from "@mui/material/ListSubheader";
 import BusinessIcon from "@mui/icons-material/Business";
 import milogo from "../login//milogo.png";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -18,27 +19,37 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import MenuConfig from "../configuracion/MenuConf";
+import Collapse from "@mui/material/Collapse";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import BuildIcon from "@mui/icons-material/Build";
+import InsertChartIcon from "@mui/icons-material/InsertChartOutlined";
+import Divider from "@mui/material/Divider";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import StarBorder from "@mui/icons-material/StarBorder";
+import DraftsIcon from "@mui/icons-material/Drafts";
+import SendIcon from "@mui/icons-material/Send";
+
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Typography from "@mui/material/Typography";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Nested from "./Nested";
 
 const drawerWidth = 240;
 
 function App() {
-  const [anchorEl, setAnchorEl] = useState(null);
   const [show, setShow] = useState(0);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
 
   const handleMenuColaborador = () => {
-    handleCloseMenu();
     setShow(1);
   };
 
+  const handleShow = (opcion) => {
+    setShow(opcion);
+  };
 
   return (
     <div style={{ display: "flex" }}>
@@ -66,37 +77,10 @@ function App() {
       >
         {/* Rest of the Drawer content */}
         <img src={milogo} alt="milogo" width="100%" />
-        <List component="nav" aria-label="secondary mailbox folder">
-          <ListItem disablePadding>
-            <ListItemButton onClick={handleClick}>
-              <ListItemIcon>
-                <ArrowDropDownIcon />
-              </ListItemIcon>
-              <ListItemText primary="Recursos Humanos" />
-            </ListItemButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleCloseMenu}
-              MenuListProps={{
-                "aria-labelledby": "basic-button",
-              }}
-            >
-              <MenuItem onClick={handleMenuColaborador}>Colaboradores</MenuItem>
-            </Menu>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <BusinessIcon />
-              </ListItemIcon>
-              <ListItemText primary="Configuración" onClick={() => setShow(2)}  />
-            </ListItemButton>
-          </ListItem>
-        </List>
+        <Nested handleShow={handleShow} />
       </Drawer>
       <main style={{ flexGrow: 1, padding: 3, marginTop: "64px" }}>
-         {show === 1 ? <Empresa /> : show === 2 ? <MenuConfig /> : null}
+        {show === 1 ? <Empresa /> : show === 2 ? <MenuConfig /> : null}
       </main>
     </div>
   );
