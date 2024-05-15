@@ -330,6 +330,10 @@ export default function Empleado(props) {
       setColonias(data);
       setListadoMunicipios(municipiosUnicos);
       if (data.length > 0) {
+        setFormValues({...formValues, estadosPais: data[0].tcodestados.id,
+          colonia: data[0].id,
+          municipio: data[0].tcodmunicipios.id
+         });
       }
     }
   }
