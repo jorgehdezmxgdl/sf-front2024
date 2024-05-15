@@ -205,7 +205,7 @@ export default function Empleado(props) {
       setFormErrors(errores);
     } else {
       insertEmployee();
-      initializeForm();
+      //initializeForm();
     }
   };
 
