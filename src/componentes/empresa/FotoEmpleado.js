@@ -79,7 +79,7 @@ export default function FotoEmpleado(props) {
   };
 
   return (
-    <>
+    <div>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2, p: 2 }}>
         <Avatar alt="Foto del empleado" src={imgSrc}  sx={{ width: 100, height: 100 }} />
          <Box sx={{ display: "flex", alignItems: "center", gap: 2, p: 2 }}>
@@ -140,6 +140,6 @@ export default function FotoEmpleado(props) {
         </DialogActions>
       </Dialog>
     </Box>
-    </>
+    </div>
   );
 }

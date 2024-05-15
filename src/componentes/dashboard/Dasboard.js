@@ -37,6 +37,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Nested from "./Nested";
+import Proveedor from "../compras/Proveedor";
 
 const drawerWidth = 240;
 
@@ -80,7 +81,7 @@ function App() {
         <Nested handleShow={handleShow} />
       </Drawer>
       <main style={{ flexGrow: 1, padding: 3, marginTop: "64px" }}>
-        {show === 1 ? <Empresa /> : show === 2 ? <MenuConfig /> : null}
+        {show === 1 ? <Empresa /> : show === 2 ? <MenuConfig /> : <Proveedor />}
       </main>
     </div>
   );

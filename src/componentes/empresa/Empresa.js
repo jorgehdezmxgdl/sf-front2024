@@ -58,7 +58,6 @@ function MyComponent(props) {
   };
 
   const handleClose = () => {    
-    console.log("me viy");
     setOpen(false);
   };
 
@@ -70,7 +69,6 @@ function MyComponent(props) {
   };
 
   const handleSubmit = () => {
-    console.log(formData); // Or submit to server
     handleClose();
   };
 
@@ -293,7 +291,7 @@ function MyComponent(props) {
               },
             }}
             pageSizeOptions={[5]}
-            onRowClick={handleClickOpen}
+            //onRowClick={handleClickOpen}
             
           />
         </Box>

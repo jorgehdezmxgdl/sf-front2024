@@ -207,9 +207,7 @@ export default function Empleado(props) {
   };
 
   const handleSubmit = () => {
-    console.log("aqui estoy jdjfdjkfj");
-    insertEmployee();
-    /*
+    
     const errores = {};
     const camposVacios = encontrarCamposVacios();
     if (camposVacios.length > 0) {
@@ -220,7 +218,8 @@ export default function Empleado(props) {
       setFormErrors(errores);
     } else {
       insertEmployee();
-      //initializeForm();
+      props.handleClose();
+      initializeForm();
     }
   };
 
