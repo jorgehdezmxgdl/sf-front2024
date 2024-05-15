@@ -21,7 +21,7 @@ import * as React from "react";
 import axios from "axios";
 
 import theme from "../themes/theme";
-import logo from "./logo2.jpeg";
+import logo from "./fondo1.webp";
 import milogo from "./milogo.png";
 
 function Copyright(props) {

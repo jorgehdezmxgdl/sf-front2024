@@ -1,4 +1,5 @@
 import { Autocomplete, Button, Grid, MenuItem, TextField } from "@mui/material";
+import { Alert, Snackbar } from "@mui/material";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
@@ -79,6 +80,11 @@ export default function Empleado(props) {
   const [listadoMunicipios, setListadoMunicipios] = React.useState([]);
   const [colonias, setColonias] = React.useState([]);
   const [foto, setFoto] = React.useState(null);
+ 
+  const [mopen, setMOpen] = React.useState(false);
+  const [message, setMessage] = React.useState("");
+  const [aviso, setAviso] = React.useState("");
+
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -152,6 +158,13 @@ export default function Empleado(props) {
     return camposVacios;
   }
 
+  const handleCloseSnack = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setMOpen(false);
+  };
+
   const initializeForm = () => {
     setFormValues({
       ...formValues,
@@ -193,8 +206,10 @@ export default function Empleado(props) {
     setFormErrors({});
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
+    console.log("aqui estoy jdjfdjkfj");
+    insertEmployee();
+    /*
     const errores = {};
     const camposVacios = encontrarCamposVacios();
     if (camposVacios.length > 0) {
@@ -210,8 +225,21 @@ export default function Empleado(props) {
   };
 
   const insertEmployee = async () => {
-    const response = await axios.post('http://localhost:5784/empleados', formValues);
-    console.log(response);
+    console.log(formValues);
+    try {
+      const response = await axios.post('http://localhost:5784/empleados', formValues);
+    } catch(error) {
+      if (error.response) {
+        // Asegúrate de que el mensaje de error es un string
+        setMessage(error.response.data.mensaje || 'Ocurrió un error desconocido');
+      } else if (error.request) {
+        setMessage('No se recibió respuesta del servidor');
+      } else {
+        setMessage('Error al realizar la solicitud');
+      }
+       setAviso("error");
+       setMOpen(true);
+    }
   }
 
   const handleCURP = (e) => {
@@ -310,12 +338,17 @@ export default function Empleado(props) {
   }
 
   return (
+    <>
     <Dialog
       open={props.open}
       maxWidth={"md"}
       PaperProps={{
         component: "form",
         onSubmit: async (event) => {
+          event.preventDefault();
+          console.log(formValues);
+          handleSubmit(event);
+         
           /*event.preventDefault();
           actualizarCampo("telef_casa", phoneHome);
           actualizarCampo("telef_mobile", phoneMobile);
@@ -659,7 +692,7 @@ export default function Empleado(props) {
                           });
                           if (
                             formErrors.numero_ss &&
-                            e.target.value.trim() !== ""
+                            e.target.value !== ""
                           ) {
                             setFormErrors({
                               ...formErrors,
@@ -667,7 +700,9 @@ export default function Empleado(props) {
                             });
                           }
                           if (e.target.value.length > 11) {
-                            alert("Please enter");
+                            setMessage("El número de seguro social debe tener 11 caracteres");
+                            setAviso("error");
+                            setMOpen(true);
                           }
                         }}
                         error={!!formErrors.numero_ss}
@@ -1457,7 +1492,6 @@ export default function Empleado(props) {
         <Button onClick={props.handleClose}>Cerrar</Button>
         <Button
           type="submit"
-          onClick={handleSubmit}
           color="primary"
           variant="contained"
         >
@@ -1465,5 +1499,20 @@ export default function Empleado(props) {
         </Button>
       </DialogActions>
     </Dialog>
+    <Snackbar
+        open={mopen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnack}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnack}
+          severity={aviso}
+          sx={{ width: "100%" }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
