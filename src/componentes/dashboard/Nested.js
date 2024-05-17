@@ -46,6 +46,9 @@ export default function Nested(props) {
       props.handleShow(3);
   };
 
+  const handleCompra_Catalogo = () => {
+      props.handleShow(4);
+  };
 
   
   return (
@@ -80,7 +83,7 @@ export default function Nested(props) {
             <ListItemIcon>
               <AutoStoriesIcon />
             </ListItemIcon>
-            <ListItemText primary="Catálogo" />
+            <ListItemText primary="Catálogo"  onClick={handleCompra_Catalogo}/>
           </ListItemButton>
         </List>
         <List component="div" disablePadding>

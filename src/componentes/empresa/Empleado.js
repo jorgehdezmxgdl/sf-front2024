@@ -80,11 +80,10 @@ export default function Empleado(props) {
   const [listadoMunicipios, setListadoMunicipios] = React.useState([]);
   const [colonias, setColonias] = React.useState([]);
   const [foto, setFoto] = React.useState(null);
- 
+
   const [mopen, setMOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [aviso, setAviso] = React.useState("");
-
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -207,7 +206,6 @@ export default function Empleado(props) {
   };
 
   const handleSubmit = () => {
-    
     const errores = {};
     const camposVacios = encontrarCamposVacios();
     if (camposVacios.length > 0) {
@@ -226,20 +224,25 @@ export default function Empleado(props) {
   const insertEmployee = async () => {
     console.log(formValues);
     try {
-      const response = await axios.post('http://localhost:5784/empleados', formValues);
-    } catch(error) {
+      const response = await axios.post(
+        "http://localhost:5784/empleados",
+        formValues
+      );
+    } catch (error) {
       if (error.response) {
         // Asegúrate de que el mensaje de error es un string
-        setMessage(error.response.data.mensaje || 'Ocurrió un error desconocido');
+        setMessage(
+          error.response.data.mensaje || "Ocurrió un error desconocido"
+        );
       } else if (error.request) {
-        setMessage('No se recibió respuesta del servidor');
+        setMessage("No se recibió respuesta del servidor");
       } else {
-        setMessage('Error al realizar la solicitud');
+        setMessage("Error al realizar la solicitud");
       }
-       setAviso("error");
-       setMOpen(true);
+      setAviso("error");
+      setMOpen(true);
     }
-  }
+  };
 
   const handleCURP = (e) => {
     let persona = curp.getPersona();
@@ -311,45 +314,50 @@ export default function Empleado(props) {
 
   async function completeAddress(my_cp) {
     setListadoMunicipios([]);
-    const response = await axios.post(`http://localhost:5784/cp-plus`, {
-      mcp: my_cp,
-    });
-
-    const data = response.data;
-    if (data) {
-      const municipiosUnicos = [];
-      const municipiosVistos = new Set();
-
-      data.forEach((item) => {
-        if (!municipiosVistos.has(item.tcodmunicipios.municipio)) {
-          municipiosUnicos.push(item);
-          municipiosVistos.add(item.tcodmunicipios.municipio);
-        }
+    try {
+      const response = await axios.post(`http://localhost:5784/cp-plus`, {
+        mcp: my_cp,
       });
-      setColonias(data);
-      setListadoMunicipios(municipiosUnicos);
-      if (data.length > 0) {
-        setFormValues({...formValues, estadosPais: data[0].tcodestados.id,
-          colonia: data[0].id,
-          municipio: data[0].tcodmunicipios.id
-         });
+      const data = response.data;
+      if (data) {
+        const municipiosUnicos = [];
+        const municipiosVistos = new Set();
+
+        data.forEach((item) => {
+          if (!municipiosVistos.has(item.tcodmunicipios.municipio)) {
+            municipiosUnicos.push(item);
+            municipiosVistos.add(item.tcodmunicipios.municipio);
+          }
+        });
+        setColonias(data);
+        setListadoMunicipios(municipiosUnicos);
+        if (data.length > 0) {
+          setFormValues({
+            ...formValues,
+            estadosPais: data[0].tcodestados.id,
+            colonia: data[0].id,
+            municipio: data[0].tcodmunicipios.id,
+          });
+        }
       }
+    } catch (error) {
+      console.error("Error al buscar datos:", error);
     }
   }
 
   return (
     <>
-    <Dialog
-      open={props.open}
-      maxWidth={"md"}
-      PaperProps={{
-        component: "form",
-        onSubmit: async (event) => {
-          event.preventDefault();
-          console.log(formValues);
-          handleSubmit(event);
-         
-          /*event.preventDefault();
+      <Dialog
+        open={props.open}
+        maxWidth={"md"}
+        PaperProps={{
+          component: "form",
+          onSubmit: async (event) => {
+            event.preventDefault();
+            console.log(formValues);
+            handleSubmit(event);
+
+            /*event.preventDefault();
           actualizarCampo("telef_casa", phoneHome);
           actualizarCampo("telef_mobile", phoneMobile);
           console.log(formData);
@@ -384,124 +392,870 @@ export default function Empleado(props) {
               console.error("Error al configurar la solicitud:", error.message);
             }
           }*/
-          //handleClose();
-        },
-      }}
-    >
-      <DialogTitle>Alta de empleado</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Complete la siguiente información para incorporar una persona a
-          nuestra compañia
-        </DialogContentText>
-        <form>
-          <Box sx={{ width: "100%" }}>
-            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                aria-label="basic tabs example"
-              >
-                <Tab label="Datos personales" {...a11yProps(0)} />
-                <Tab label="Domicilio" {...a11yProps(1)} />
-                <Tab label="Área de trabajo" {...a11yProps(2)} />
-                <Tab label="Sistemas" {...a11yProps(3)} />
-                <Tab label="Horarios" {...a11yProps(4)} />
-              </Tabs>
-            </Box>
-            <CustomTabPanel value={value} index={0}>
-              <Grid item xs={12} md={6}>
+            //handleClose();
+          },
+        }}
+      >
+        <DialogTitle>Alta de empleado</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Complete la siguiente información para incorporar una persona a
+            nuestra compañia
+          </DialogContentText>
+          <form>
+            <Box sx={{ width: "100%" }}>
+              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  aria-label="basic tabs example"
+                >
+                  <Tab label="Datos personales" {...a11yProps(0)} />
+                  <Tab label="Domicilio" {...a11yProps(1)} />
+                  <Tab label="Área de trabajo" {...a11yProps(2)} />
+                  <Tab label="Sistemas" {...a11yProps(3)} />
+                  <Tab label="Horarios" {...a11yProps(4)} />
+                </Tabs>
+              </Box>
+              <CustomTabPanel value={value} index={0}>
+                <Grid item xs={12} md={6}>
+                  <div>
+                    <Grid container spacing={2}>
+                      <FotoEmpleado handleFoto={handleFoto} />
+                    </Grid>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={4}>
+                        <TextField
+                          label="Nombre(s)"
+                          fullWidth
+                          margin="normal"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          value={formValues.nombre}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              nombre: e.target.value,
+                            });
+                            if (
+                              formErrors.nombre &&
+                              e.target.value.trim() !== ""
+                            ) {
+                              setFormErrors({ ...formErrors, nombre: "" });
+                            }
+                          }}
+                          inputProps={{ style: { textTransform: "uppercase" } }}
+                          error={!!formErrors.nombre}
+                          helperText={formErrors.nombre || ""}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="Apellido Paterno"
+                          fullWidth
+                          margin="normal"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          value={formValues.apellido_paterno}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              apellido_paterno: e.target.value,
+                            });
+                            if (
+                              formErrors.apellido_paterno &&
+                              e.target.value.trim() !== ""
+                            ) {
+                              setFormErrors({
+                                ...formErrors,
+                                apellido_paterno: "",
+                              });
+                            }
+                          }}
+                          inputProps={{ style: { textTransform: "uppercase" } }}
+                          error={!!formErrors.apellido_paterno}
+                          helperText={formErrors.apellido_paterno || ""}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="Apellido Materno"
+                          fullWidth
+                          margin="normal"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          value={formValues.apellido_materno}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              apellido_materno: e.target.value,
+                            });
+                            if (
+                              formErrors.apellido_materno &&
+                              e.target.value.trim() !== ""
+                            ) {
+                              setFormErrors({
+                                ...formErrors,
+                                apellido_materno: "",
+                              });
+                            }
+                          }}
+                          inputProps={{ style: { textTransform: "uppercase" } }}
+                          error={!!formErrors.apellido_materno}
+                          helperText={formErrors.apellido_materno || ""}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <div>
+                          <DemoContainer components={["DatePicker"]}>
+                            <LocalizationProvider
+                              dateAdapter={AdapterDayjs}
+                              adapterLocale={es}
+                              localeText={spanishLocale}
+                            >
+                              <DatePicker
+                                margin="normal"
+                                fullWidth
+                                label="Fecha de nacimiento"
+                                value={formValues.fecha_nacimiento}
+                                disableFuture
+                                onChange={(e) => {
+                                  setFormValues({
+                                    ...formValues,
+                                    fecha_nacimiento: dayjs(e),
+                                  });
+                                  if (
+                                    formErrors.fecha_nacimiento &&
+                                    e.target.value.trim() !== ""
+                                  ) {
+                                    setFormErrors({
+                                      ...formErrors,
+                                      fecha_nacimiento: "",
+                                    });
+                                  }
+                                }}
+                                slotProps={{
+                                  textField: {
+                                    helperText: "DD/MM/AAAA",
+                                  },
+                                }}
+                              />
+                            </LocalizationProvider>
+                          </DemoContainer>
+                        </div>
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="Edad"
+                          margin="normal"
+                          fullWidth
+                          inputProps={{
+                            maxLength: 25,
+                          }}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          InputProps={{
+                            readOnly: true,
+                            style: { textTransform: "uppercase" },
+                          }}
+                          value={dayjs().diff(
+                            formValues.fecha_nacimiento,
+                            "year"
+                          )}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="Género"
+                          select
+                          fullWidth
+                          margin="normal"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          value={formValues.genero}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              genero: e.target.value,
+                            });
+                            if (
+                              formErrors.genero &&
+                              e.target.value.trim() !== ""
+                            ) {
+                              setFormErrors({
+                                ...formErrors,
+                                genero: "",
+                              });
+                            }
+                          }}
+                          inputProps={{ style: { textTransform: "uppercase" } }}
+                          onBlur={(e) => {
+                            handleCURP(e);
+                          }}
+                          error={!!formErrors.genero}
+                          helperText={formErrors.genero || ""}
+                        >
+                          <MenuItem value="M">Masculino</MenuItem>
+                          <MenuItem value="F">Femenino</MenuItem>
+                          <MenuItem value="X">No binario</MenuItem>
+                          <MenuItem value="N">Prefiero no contestar</MenuItem>
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="Estado Civil"
+                          select
+                          fullWidth
+                          value={formValues.estado_civil}
+                          margin="normal"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          inputProps={{ style: { textTransform: "uppercase" } }}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              estado_civil: e.target.value,
+                            });
+                            if (
+                              formErrors.estado_civil &&
+                              e.target.value.trim() !== ""
+                            ) {
+                              setFormErrors({
+                                ...formErrors,
+                                estado_civil: "",
+                              });
+                            }
+                          }}
+                          error={!!formErrors.estado_civil}
+                          helperText={formErrors.estado_civil || ""}
+                        >
+                          <MenuItem value="S">Soltero/a</MenuItem>
+                          <MenuItem value="C">Casado/a</MenuItem>
+                          <MenuItem value="D">Divorciado/a</MenuItem>
+                          <MenuItem value="V">Viudo/a</MenuItem>
+                          <MenuItem value="U">Unión libre</MenuItem>
+                          <MenuItem value="O">Otro</MenuItem>
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="Tipo de Sangre"
+                          select
+                          fullWidth
+                          value={formValues.tipo_sangre}
+                          margin="normal"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          inputProps={{ style: { textTransform: "uppercase" } }}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              tipo_sangre: e.target.value,
+                            });
+                            if (
+                              formErrors.tipo_sangre &&
+                              e.target.value.trim() !== ""
+                            ) {
+                              setFormErrors({
+                                ...formErrors,
+                                tipo_sangre: "",
+                              });
+                            }
+                          }}
+                          error={!!formErrors.tipo_sangre}
+                          helperText={formErrors.tipo_sangre || ""}
+                        >
+                          <MenuItem value="A+">A+</MenuItem>
+                          <MenuItem value="A-">A-</MenuItem>
+                          <MenuItem value="B+">B+</MenuItem>
+                          <MenuItem value="B-">B-</MenuItem>
+                          <MenuItem value="AB+">AB+</MenuItem>
+                          <MenuItem value="AB-">AB-</MenuItem>
+                          <MenuItem value="O+">O+</MenuItem>
+                          <MenuItem value="O-">O-</MenuItem>
+                          <MenuItem value="D">No lo sé</MenuItem>
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="Número de Seguro Social"
+                          fullWidth
+                          type="number"
+                          margin="normal"
+                          value={formValues.numero_ss}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              numero_ss: e.target.value,
+                            });
+                            if (formErrors.numero_ss && e.target.value !== "") {
+                              setFormErrors({
+                                ...formErrors,
+                                numero_ss: "",
+                              });
+                            }
+                            if (e.target.value.length > 11) {
+                              setMessage(
+                                "El número de seguro social debe tener 11 caracteres"
+                              );
+                              setAviso("error");
+                              setMOpen(true);
+                            }
+                          }}
+                          error={!!formErrors.numero_ss}
+                          helperText={formErrors.numero_ss || ""}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="CURP"
+                          fullWidth
+                          margin="normal"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          inputProps={{
+                            style: { textTransform: "uppercase" },
+                            maxLength: 18,
+                          }}
+                          value={formValues.curp}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              curp: e.target.value,
+                            });
+                            if (
+                              formErrors.curp &&
+                              e.target.value.trim() !== ""
+                            ) {
+                              setFormErrors({
+                                ...formErrors,
+                                curp: "",
+                              });
+                            }
+                          }}
+                          error={!!formErrors.curp}
+                          helperText={formErrors.curp || ""}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="RFC"
+                          fullWidth
+                          margin="normal"
+                          value={formValues.rfc}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          inputProps={{
+                            style: { textTransform: "uppercase" },
+                            maxLength: 13,
+                          }}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              rfc: e.target.value,
+                            });
+                            if (
+                              formErrors.rfc &&
+                              e.target.value.trim() !== ""
+                            ) {
+                              setFormErrors({
+                                ...formErrors,
+                                rfc: "",
+                              });
+                            }
+                          }}
+                          error={!!formErrors.rfc}
+                          helperText={formErrors.rfc || ""}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <TextField
+                          label="Correo electrónico"
+                          type="email"
+                          fullWidth
+                          value={formValues.email}
+                          margin="normal"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          inputProps={{ style: { textTransform: "lowercase" } }}
+                          onChange={(e) => {
+                            setFormValues({
+                              ...formValues,
+                              email: e.target.value,
+                            });
+                            if (
+                              formErrors.email &&
+                              e.target.value.trim() !== ""
+                            ) {
+                              setFormErrors({
+                                ...formErrors,
+                                email: "",
+                              });
+                            }
+                          }}
+                          error={!!formErrors.email}
+                          helperText={formErrors.email || ""}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <MuiTelInput
+                          label="Teléfono de casa"
+                          fullWidth
+                          variant="outlined"
+                          value={telef_casa}
+                          defaultCountry="MX"
+                          onChange={(e) => {
+                            setTelCasa(e);
+                            setFormValues({
+                              ...formValues,
+                              telef_casa: telef_casa,
+                            });
+                          }}
+                          inputProps={{ maxLength: 16 }}
+                        />
+                      </Grid>
+                      <Grid item xs={6} sm={4}>
+                        <MuiTelInput
+                          label="Teléfono celular"
+                          fullWidth
+                          variant="outlined"
+                          defaultCountry="MX"
+                          onChange={(e) => {
+                            setTelMovil(e);
+                            setFormValues({
+                              ...formValues,
+                              telef_mobile: telef_mobile,
+                            });
+                            if (
+                              formErrors.telef_mobile &&
+                              telef_mobile.trim() !== ""
+                            ) {
+                              setFormErrors({
+                                ...formErrors,
+                                telef_mobile: "",
+                              });
+                            }
+                          }}
+                          value={telef_mobile}
+                          inputProps={{ maxLength: 16 }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </div>
+                </Grid>
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={1}>
                 <div>
-                  <Grid container spacing={2}>
-                    <FotoEmpleado handleFoto={handleFoto} />
-                  </Grid>
+                  <TextField
+                    label="Domicilio (Calle y número)"
+                    fullWidth
+                    placeholder="Calle Venustiano Carranza #1234 esquina Miguel de Legaspi"
+                    value={formValues.domicilio}
+                    margin="normal"
+                    inputProps={{ style: { textTransform: "uppercase" } }}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        domicilio: e.target.value,
+                      });
+                      if (
+                        formErrors.domicilio &&
+                        e.target.value.trim() !== ""
+                      ) {
+                        setFormErrors({
+                          ...formErrors,
+                          domicilio: "",
+                        });
+                      }
+                    }}
+                    error={!!formErrors.domicilio}
+                    helperText={formErrors.domicilio || ""}
+                  />
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
-                      <TextField
-                        label="Nombre(s)"
-                        fullWidth
-                        margin="normal"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        value={formValues.nombre}
-                        onChange={(e) => {
-                          setFormValues({
-                            ...formValues,
-                            nombre: e.target.value,
-                          });
-                          if (
-                            formErrors.nombre &&
-                            e.target.value.trim() !== ""
-                          ) {
-                            setFormErrors({ ...formErrors, nombre: "" });
-                          }
-                        }}
-                        inputProps={{ style: { textTransform: "uppercase" } }}
-                        error={!!formErrors.nombre}
-                        helperText={formErrors.nombre || ""}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <TextField
-                        label="Apellido Paterno"
-                        fullWidth
-                        margin="normal"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        value={formValues.apellido_paterno}
-                        onChange={(e) => {
-                          setFormValues({
-                            ...formValues,
-                            apellido_paterno: e.target.value,
-                          });
-                          if (
-                            formErrors.apellido_paterno &&
-                            e.target.value.trim() !== ""
-                          ) {
-                            setFormErrors({
-                              ...formErrors,
-                              apellido_paterno: "",
+                      <Autocomplete
+                        getOptionLabel={(option) => option.cp.toString()}
+                        options={options}
+                        noOptionsText="Escriba un código postal"
+                        inputValue={inputValue || formValues.codigo_postal}
+                        onInputChange={(event, newInputValue) => {
+                          setInputValue(newInputValue);
+                          if (newInputValue.length === 5) {
+                            completeAddress(newInputValue);
+                            setFormValues({
+                              ...formValues,
+                              codigo_postal: newInputValue,
                             });
                           }
                         }}
-                        inputProps={{ style: { textTransform: "uppercase" } }}
-                        error={!!formErrors.apellido_paterno}
-                        helperText={formErrors.apellido_paterno || ""}
+                        onClick={() => {}}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Código Postal"
+                            variant="outlined"
+                            margin="normal"
+                            maxLength="5"
+                            onFocus={() => setInputValue("")}
+                            InputProps={{
+                              ...params.InputProps,
+                            }}
+                          />
+                        )}
                       />
                     </Grid>
                     <Grid item xs={6} sm={4}>
                       <TextField
-                        label="Apellido Materno"
+                        label="Colonia"
+                        select
                         fullWidth
+                        margin="normal"
+                        value={formValues.colonia}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        onChange={(e) => {
+                          setFormValues({
+                            ...formValues,
+                            colonia: e.target.value,
+                          });
+                          if (formErrors.colonia && e.target.value !== "") {
+                            setFormErrors({
+                              ...formErrors,
+                              colonia: "",
+                            });
+                          }
+                        }}
+                        error={!!formErrors.colonia}
+                        helperText={formErrors.colonia || ""}
+                      >
+                        {colonias.map((item, index) => (
+                          <MenuItem key={index} value={item.id}>
+                            {item.colonia}
+                          </MenuItem>
+                        ))}
+                        <MenuItem value="O">Otro</MenuItem>
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={6} sm={4}>
+                      <TextField
+                        label="Municipio"
+                        select
+                        fullWidth
+                        value={formValues.municipio}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        value={formValues.apellido_materno}
                         onChange={(e) => {
                           setFormValues({
                             ...formValues,
-                            apellido_materno: e.target.value,
+                            municipio: e.target.value,
                           });
-                          if (
-                            formErrors.apellido_materno &&
-                            e.target.value.trim() !== ""
-                          ) {
+                          if (formErrors.municipio && e.target.value !== "") {
                             setFormErrors({
                               ...formErrors,
-                              apellido_materno: "",
+                              municipio: "",
                             });
                           }
                         }}
-                        inputProps={{ style: { textTransform: "uppercase" } }}
-                        error={!!formErrors.apellido_materno}
-                        helperText={formErrors.apellido_materno || ""}
-                      />
+                        error={!!formErrors.municipio}
+                        helperText={formErrors.municipio || ""}
+                      >
+                        {listadoMunicipios.map((item, index) => (
+                          <MenuItem key={index} value={item.tcodmunicipios.id}>
+                            {item.tcodmunicipios.municipio}
+                          </MenuItem>
+                        ))}
+                        <MenuItem value="O">Otro</MenuItem>
+                      </TextField>
+                    </Grid>
+                  </Grid>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6} sm={4}>
+                      <TextField
+                        label="Estado"
+                        select
+                        fullWidth
+                        value={formValues.estadosPais}
+                        margin="normal"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        onChange={(e) => {
+                          setFormValues({
+                            ...formValues,
+                            estadosPais: e.target.value,
+                          });
+                          if (formErrors.estadosPais && e.target.value !== "") {
+                            setFormErrors({
+                              ...formErrors,
+                              estadosPais: "",
+                            });
+                          }
+                        }}
+                        error={!!formErrors.estadosPais}
+                        helperText={formErrors.estadosPais || ""}
+                      >
+                        {estadosPais.map((option) => (
+                          <MenuItem key={option.id} value={option.id}>
+                            {option.estado}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
                     <Grid item xs={6} sm={4}>
-                      <div>
+                      <TextField
+                        label="Pais"
+                        margin="normal"
+                        fullWidth
+                        select
+                        value={formValues.pais}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      >
+                        <MenuItem value="MX" key="MX">
+                          México
+                        </MenuItem>
+                      </TextField>
+                    </Grid>
+                  </Grid>
+                </div>
+                <Divider>
+                  <Chip
+                    label="Datos de contacto en caso de emergencia"
+                    size="small"
+                  />
+                </Divider>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    label="Nombre del contacto de emergencia"
+                    type="text"
+                    fullWidth
+                    inputProps={{ style: { textTransform: "uppercase" } }}
+                    margin="normal"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    value={formValues.emergencia}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        emergencia: e.target.value,
+                      });
+                      if (
+                        formErrors.emergencia &&
+                        e.target.value.trim() !== ""
+                      ) {
+                        setFormErrors({ ...formErrors, emergencia: "" });
+                      }
+                    }}
+                    placeholder="Ej: José María López Hernández"
+                    error={!!formErrors.emergencia}
+                    helperText={formErrors.emergencia || ""}
+                  />
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <p></p>
+                  <MuiTelInput
+                    label="Teléfono de emergencia"
+                    fullWidth
+                    value={emergencia}
+                    variant="outlined"
+                    defaultCountry="MX"
+                    onChange={(e) => {
+                      setEmergencia(e);
+                      formValues.telef_emergencia = emergencia;
+                      if (
+                        formErrors.telef_emergencia &&
+                        emergencia.trim() !== ""
+                      ) {
+                        setFormErrors({ ...formErrors, telef_emergencia: "" });
+                      }
+                    }}
+                    inputProps={{ maxLength: 16 }}
+                    error={!!formErrors.telef_emergencia}
+                    helperText={formErrors.telef_emergencia || ""}
+                  />
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    label="Observaciones/Indicaciones"
+                    type="text"
+                    fullWidth
+                    margin="normal"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    value={formValues.observaciones}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        observaciones: e.target.value,
+                      });
+                      if (
+                        formErrors.observaciones &&
+                        e.target.value.trim() !== ""
+                      ) {
+                        setFormErrors({
+                          ...formErrors,
+                          observaciones: "",
+                        });
+                      }
+                    }}
+                    error={!!formErrors.observaciones}
+                    helperText={formErrors.observaciones || ""}
+                    placeholder="Indicaciones especiales (horario, parentesco) para el contacto de emergencia"
+                  />
+                </Grid>
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={2}>
+                <Grid item xs={6} sm={4}>
+                  <TextField
+                    label="Departamento"
+                    select
+                    fullWidth
+                    value={formValues.departamento}
+                    margin="normal"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    onChange={(e) => {
+                      setFormValues({
+                        ...formValues,
+                        departamento: e.target.value,
+                      });
+                      if (formErrors.departamento && e.target.value !== "") {
+                        setFormErrors({
+                          ...formErrors,
+                          departamento: "",
+                        });
+                      }
+                    }}
+                  >
+                    {departamento.map((item, index) => (
+                      <MenuItem key={index} value={item.id}>
+                        {item.nombre}
+                      </MenuItem>
+                    ))}
+                    error={!!formErrors.departamento}
+                    helperText={formErrors.departamento || ""}
+                  </TextField>
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <Grid item xs={6} sm={4}>
+                    <TextField
+                      label="Puesto"
+                      select
+                      fullWidth
+                      margin="normal"
+                      value={formValues.puesto}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      onChange={(e) => {
+                        setFormValues({
+                          ...formValues,
+                          puesto: e.target.value,
+                        });
+                        if (formErrors.puesto && e.target.value !== "") {
+                          setFormErrors({
+                            ...formErrors,
+                            puesto: "",
+                          });
+                        }
+                      }}
+                    >
+                      {puesto.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>
+                          {item.nombre}
+                        </MenuItem>
+                      ))}
+                      error={!!formErrors.puesto}
+                      helperText={formErrors.puesto || ""}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={6} sm={4}>
+                    <TextField
+                      label="Jefe inmediato"
+                      select
+                      fullWidth
+                      value={formValues.jefe}
+                      margin="normal"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      onChange={(e) => {
+                        setFormValues({
+                          ...formValues,
+                          jefe: e.target.value,
+                        });
+                        if (formErrors.jefe && e.target.value !== "") {
+                          setFormErrors({
+                            ...formErrors,
+                            jefe: "",
+                          });
+                        }
+                      }}
+                    >
+                      {puesto.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>
+                          {item.nombre}
+                        </MenuItem>
+                      ))}
+                      error={!!formErrors.jefe}
+                      helperText={formErrors.jefe || ""}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <p></p>
+                        <FormControl fullWidth>
+                          <InputLabel htmlFor="outlined-adornment-amount">
+                            Salario
+                          </InputLabel>
+                          <OutlinedInput
+                            id="outlined-adornment-amount"
+                            startAdornment={
+                              <InputAdornment position="start">
+                                $
+                              </InputAdornment>
+                            }
+                            label="Salario"
+                            value={formValues.salario}
+                            onChange={(e) => {
+                              setFormValues({
+                                ...formValues,
+                                salario: e.target.value,
+                              });
+                              if (formErrors.salario && e.target.value !== "") {
+                                setFormErrors({ ...formErrors, salario: "" });
+                              }
+                            }}
+                            error={!!formErrors.salario}
+                            helperText={formErrors.salario || ""}
+                          />
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={6}>
                         <DemoContainer components={["DatePicker"]}>
                           <LocalizationProvider
                             dateAdapter={AdapterDayjs}
@@ -511,995 +1265,263 @@ export default function Empleado(props) {
                             <DatePicker
                               margin="normal"
                               fullWidth
-                              label="Fecha de nacimiento"
-                              value={formValues.fecha_nacimiento}
+                              sx={{ width: "100%" }}
+                              label="Fecha de ingreso"
+                              value={formValues.fecha_ingreso}
                               disableFuture
                               onChange={(e) => {
                                 setFormValues({
                                   ...formValues,
-                                  fecha_nacimiento: dayjs(e),
+                                  fecha_ingreso: dayjs(e).format("DD/MM/YYYY"),
                                 });
                                 if (
-                                  formErrors.fecha_nacimiento &&
-                                  e.target.value.trim() !== ""
+                                  formErrors.fecha_ingreso &&
+                                  e.target.value !== ""
                                 ) {
                                   setFormErrors({
                                     ...formErrors,
-                                    fecha_nacimiento: "",
+                                    fecha_ingreso: "",
                                   });
                                 }
                               }}
                               slotProps={{
                                 textField: {
-                                  helperText: "DD/MM/AAAA",
+                                  helperText: `Antigüedad: ${dayjs().diff(
+                                    formValues.fecha_ingreso,
+                                    "year"
+                                  )} años`,
                                 },
                               }}
+                              error={!!formErrors.fecha_ingreso}
+                              helperText={formErrors.fecha_ingreso || ""}
                             />
                           </LocalizationProvider>
                         </DemoContainer>
-                      </div>
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <TextField
-                        label="Edad"
-                        margin="normal"
-                        fullWidth
-                        inputProps={{
-                          maxLength: 25,
-                        }}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        InputProps={{
-                          readOnly: true,
-                          style: { textTransform: "uppercase" },
-                        }}
-                        value={dayjs().diff(
-                          formValues.fecha_nacimiento,
-                          "year"
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <TextField
-                        label="Género"
-                        select
-                        fullWidth
-                        margin="normal"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        value={formValues.genero}
-                        onChange={(e) => {
-                          setFormValues({
-                            ...formValues,
-                            genero: e.target.value,
-                          });
-                          if (
-                            formErrors.genero &&
-                            e.target.value.trim() !== ""
-                          ) {
-                            setFormErrors({
-                              ...formErrors,
-                              genero: "",
-                            });
-                          }
-                        }}
-                        inputProps={{ style: { textTransform: "uppercase" } }}
-                        onBlur={(e) => {
-                          handleCURP(e);
-                        }}
-                        error={!!formErrors.genero}
-                        helperText={formErrors.genero || ""}
-                      >
-                        <MenuItem value="M">Masculino</MenuItem>
-                        <MenuItem value="F">Femenino</MenuItem>
-                        <MenuItem value="X">No binario</MenuItem>
-                        <MenuItem value="N">Prefiero no contestar</MenuItem>
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <TextField
-                        label="Estado Civil"
-                        select
-                        fullWidth
-                        value={formValues.estado_civil}
-                        margin="normal"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        inputProps={{ style: { textTransform: "uppercase" } }}
-                        onChange={(e) => {
-                          setFormValues({
-                            ...formValues,
-                            estado_civil: e.target.value,
-                          });
-                          if (
-                            formErrors.estado_civil &&
-                            e.target.value.trim() !== ""
-                          ) {
-                            setFormErrors({
-                              ...formErrors,
-                              estado_civil: "",
-                            });
-                          }
-                        }}
-                        error={!!formErrors.estado_civil}
-                        helperText={formErrors.estado_civil || ""}
-                      >
-                        <MenuItem value="S">Soltero/a</MenuItem>
-                        <MenuItem value="C">Casado/a</MenuItem>
-                        <MenuItem value="D">Divorciado/a</MenuItem>
-                        <MenuItem value="V">Viudo/a</MenuItem>
-                        <MenuItem value="U">Unión libre</MenuItem>
-                        <MenuItem value="O">Otro</MenuItem>
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <TextField
-                        label="Tipo de Sangre"
-                        select
-                        fullWidth
-                        value={formValues.tipo_sangre}
-                        margin="normal"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        inputProps={{ style: { textTransform: "uppercase" } }}
-                        onChange={(e) => {
-                          setFormValues({
-                            ...formValues,
-                            tipo_sangre: e.target.value,
-                          });
-                          if (
-                            formErrors.tipo_sangre &&
-                            e.target.value.trim() !== ""
-                          ) {
-                            setFormErrors({
-                              ...formErrors,
-                              tipo_sangre: "",
-                            });
-                          }
-                        }}
-                        error={!!formErrors.tipo_sangre}
-                        helperText={formErrors.tipo_sangre || ""}
-                      >
-                        <MenuItem value="A+">A+</MenuItem>
-                        <MenuItem value="A-">A-</MenuItem>
-                        <MenuItem value="B+">B+</MenuItem>
-                        <MenuItem value="B-">B-</MenuItem>
-                        <MenuItem value="AB+">AB+</MenuItem>
-                        <MenuItem value="AB-">AB-</MenuItem>
-                        <MenuItem value="O+">O+</MenuItem>
-                        <MenuItem value="O-">O-</MenuItem>
-                        <MenuItem value="D">No lo sé</MenuItem>
-                      </TextField>
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <TextField
-                        label="Número de Seguro Social"
-                        fullWidth
-                        type="number"
-                        margin="normal"
-                        value={formValues.numero_ss}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        onChange={(e) => {
-                          setFormValues({
-                            ...formValues,
-                            numero_ss: e.target.value,
-                          });
-                          if (
-                            formErrors.numero_ss &&
-                            e.target.value !== ""
-                          ) {
-                            setFormErrors({
-                              ...formErrors,
-                              numero_ss: "",
-                            });
-                          }
-                          if (e.target.value.length > 11) {
-                            setMessage("El número de seguro social debe tener 11 caracteres");
-                            setAviso("error");
-                            setMOpen(true);
-                          }
-                        }}
-                        error={!!formErrors.numero_ss}
-                        helperText={formErrors.numero_ss || ""}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <TextField
-                        label="CURP"
-                        fullWidth
-                        margin="normal"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        inputProps={{
-                          style: { textTransform: "uppercase" },
-                          maxLength: 18,
-                        }}
-                        value={formValues.curp}
-                        onChange={(e) => {
-                          setFormValues({
-                            ...formValues,
-                            curp: e.target.value,
-                          });
-                          if (formErrors.curp && e.target.value.trim() !== "") {
-                            setFormErrors({
-                              ...formErrors,
-                              curp: "",
-                            });
-                          }
-                        }}
-                        error={!!formErrors.curp}
-                        helperText={formErrors.curp || ""}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <TextField
-                        label="RFC"
-                        fullWidth
-                        margin="normal"
-                        value={formValues.rfc}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        inputProps={{
-                          style: { textTransform: "uppercase" },
-                          maxLength: 13,
-                        }}
-                        onChange={(e) => {
-                          setFormValues({
-                            ...formValues,
-                            rfc: e.target.value,
-                          });
-                          if (formErrors.rfc && e.target.value.trim() !== "") {
-                            setFormErrors({
-                              ...formErrors,
-                              rfc: "",
-                            });
-                          }
-                        }}
-                        error={!!formErrors.rfc}
-                        helperText={formErrors.rfc || ""}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <TextField
-                        label="Correo electrónico"
-                        type="email"
-                        fullWidth
-                        value={formValues.email}
-                        margin="normal"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        inputProps={{ style: { textTransform: "lowercase" } }}
-                        onChange={(e) => {
-                          setFormValues({
-                            ...formValues,
-                            email: e.target.value,
-                          });
-                          if (
-                            formErrors.email &&
-                            e.target.value.trim() !== ""
-                          ) {
-                            setFormErrors({
-                              ...formErrors,
-                              email: "",
-                            });
-                          }
-                        }}
-                        error={!!formErrors.email}
-                        helperText={formErrors.email || ""}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <MuiTelInput
-                        label="Teléfono de casa"
-                        fullWidth
-                        variant="outlined"
-                        value={telef_casa}
-                        defaultCountry="MX"
-                        onChange={(e) => {
-                          setTelCasa(e);
-                          setFormValues({
-                            ...formValues,
-                            telef_casa: telef_casa,
-                          });
-                        }}
-                        inputProps={{ maxLength: 16 }}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={4}>
-                      <MuiTelInput
-                        label="Teléfono celular"
-                        fullWidth
-                        variant="outlined"
-                        defaultCountry="MX"
-                        onChange={(e) => {
-                          setTelMovil(e);
-                          setFormValues({
-                            ...formValues,
-                            telef_mobile: telef_mobile,
-                          });
-                          if (
-                            formErrors.telef_mobile &&
-                            telef_mobile.trim() !== ""
-                          ) {
-                            setFormErrors({ ...formErrors, telef_mobile: "" });
-                          }
-                        }}
-                        value={telef_mobile}
-                        inputProps={{ maxLength: 16 }}
-                      />
+                      </Grid>
                     </Grid>
                   </Grid>
-                </div>
-              </Grid>
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={1}>
-              <div>
-                <TextField
-                  label="Domicilio (Calle y número)"
-                  fullWidth
-                  placeholder="Calle Venustiano Carranza #1234 esquina Miguel de Legaspi"
-                  value={formValues.domicilio}
-                  margin="normal"
-                  inputProps={{ style: { textTransform: "uppercase" } }}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  onChange={(e) => {
-                    setFormValues({
-                      ...formValues,
-                      domicilio: e.target.value,
-                    });
-                    if (formErrors.domicilio && e.target.value.trim() !== "") {
-                      setFormErrors({
-                        ...formErrors,
-                        domicilio: "",
-                      });
-                    }
-                  }}
-                  error={!!formErrors.domicilio}
-                  helperText={formErrors.domicilio || ""}
-                />
+                </Grid>
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={3}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={4}>
-                    <Autocomplete
-                      getOptionLabel={(option) => option.cp.toString()}
-                      options={options}
-                      noOptionsText="Escriba un código postal"
-                      inputValue={inputValue || formValues.codigo_postal}
-                      onInputChange={(event, newInputValue) => {
-                        setInputValue(newInputValue);
-                        if (newInputValue.length === 5) {
-                          completeAddress(newInputValue);
-                          setFormValues({
-                            ...formValues,
-                            codigo_postal: newInputValue,
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Nombre de usuario"
+                      fullWidth
+                      margin="normal"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      value={formValues.nombre_usuario}
+                      onChange={(e) => {
+                        setFormValues({
+                          ...formValues,
+                          nombre_usuario: e.target.value,
+                        });
+                        if (
+                          formErrors.nombre_usuario &&
+                          e.target.value.trim() !== ""
+                        ) {
+                          setFormErrors({
+                            ...formErrors,
+                            nombre_usuario: "",
                           });
                         }
                       }}
-                      onClick={() => {}}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Código Postal"
-                          variant="outlined"
-                          margin="normal"
-                          maxLength="5"
-                          onFocus={() => setInputValue("")}
-                          InputProps={{
-                            ...params.InputProps,
-                          }}
-                        />
-                      )}
+                      error={!!formErrors.nombre_usuario}
+                      helperText={formErrors.nombre_usuario || ""}
                     />
                   </Grid>
-                  <Grid item xs={6} sm={4}>
+                  <Grid item xs={6}>
                     <TextField
-                      label="Colonia"
-                      select
+                      label="Contraseña"
+                      type="password"
                       fullWidth
                       margin="normal"
-                      value={formValues.colonia}
                       InputLabelProps={{
                         shrink: true,
                       }}
+                      value={formValues.contrasena}
                       onChange={(e) => {
                         setFormValues({
                           ...formValues,
-                          colonia: e.target.value,
+                          contrasena: e.target.value,
                         });
-                        if (formErrors.colonia && e.target.value !== "") {
+                        if (
+                          formErrors.contrasena &&
+                          e.target.value.trim() !== ""
+                        ) {
                           setFormErrors({
                             ...formErrors,
-                            colonia: "",
+                            contrasena: "",
                           });
                         }
                       }}
-                      error={!!formErrors.colonia}
-                      helperText={formErrors.colonia || ""}
-                    >
-                      {colonias.map((item, index) => (
-                        <MenuItem key={index} value={item.id}>
-                          {item.colonia}
-                        </MenuItem>
-                      ))}
-                      <MenuItem value="O">Otro</MenuItem>
-                    </TextField>
+                      error={!!formErrors.contrasena}
+                      helperText={formErrors.contrasena || ""}
+                    />
                   </Grid>
-                  <Grid item xs={6} sm={4}>
+                  <Grid item xs={6}>
                     <TextField
-                      label="Municipio"
-                      select
+                      label="Confirmar contraseña"
+                      type="password"
                       fullWidth
-                      value={formValues.municipio}
                       margin="normal"
                       InputLabelProps={{
                         shrink: true,
                       }}
+                      value={formValues.contrasena2}
                       onChange={(e) => {
                         setFormValues({
                           ...formValues,
-                          municipio: e.target.value,
+                          contrasena2: e.target.value,
                         });
-                        if (formErrors.municipio && e.target.value !== "") {
+                        if (
+                          formErrors.contrasena2 &&
+                          e.target.value.trim() !== ""
+                        ) {
                           setFormErrors({
                             ...formErrors,
-                            municipio: "",
+                            contrasena2: "",
                           });
                         }
                       }}
-                      error={!!formErrors.municipio}
-                      helperText={formErrors.municipio || ""}
-                    >
-                      {listadoMunicipios.map((item, index) => (
-                        <MenuItem key={index} value={item.tcodmunicipios.id}>
-                          {item.tcodmunicipios.municipio}
-                        </MenuItem>
-                      ))}
-                      <MenuItem value="O">Otro</MenuItem>
-                    </TextField>
+                      error={!!formErrors.contrasena2}
+                      helperText={formErrors.contrasena2 || ""}
+                    />
                   </Grid>
-                </Grid>
-                <Grid container spacing={2}>
-                  <Grid item xs={6} sm={4}>
+                  <Grid item xs={12}>
                     <TextField
-                      label="Estado"
+                      label="Rol"
                       select
                       fullWidth
-                      value={formValues.estadosPais}
                       margin="normal"
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      onChange={(e) => {
-                        setFormValues({
-                          ...formValues,
-                          estadosPais: e.target.value,
-                        });
-                        if (formErrors.estadosPais && e.target.value !== "") {
-                          setFormErrors({
-                            ...formErrors,
-                            estadosPais: "",
-                          });
-                        }
-                      }}
-                      error={!!formErrors.estadosPais}
-                      helperText={formErrors.estadosPais || ""}
                     >
-                      {estadosPais.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                          {option.estado}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={6} sm={4}>
-                    <TextField
-                      label="Pais"
-                      margin="normal"
-                      fullWidth
-                      select
-                      value={formValues.pais}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    >
-                      <MenuItem value="MX" key="MX">
-                        México
+                      <MenuItem label="Administrador" value="1">
+                        Administrador
+                      </MenuItem>
+                      <MenuItem label="Usuario" value="2">
+                        Usuario
+                      </MenuItem>
+                      <MenuItem label="Invitado" value="3">
+                        Invitado
                       </MenuItem>
                     </TextField>
                   </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Tiempo de innactividad"
+                      type="number"
+                      fullWidth
+                      margin="normal"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="start">
+                            horas
+                          </InputAdornment>
+                        ),
+                      }}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      value={formValues.tiempo_innactivo}
+                      onChange={(e) => {
+                        setFormValues({
+                          ...formValues,
+                          tiempo_innactivo: e.target.value,
+                        });
+                        if (
+                          formErrors.tiempo_innactivo &&
+                          e.target.value.trim() !== ""
+                        ) {
+                          setFormErrors({
+                            ...formErrors,
+                            tiempo_innactivo: "",
+                          });
+                        }
+                      }}
+                      error={!!formErrors.tiempo_innactivo}
+                      helperText={formErrors.tiempo_innactivo || ""}
+                    />
+                  </Grid>
                 </Grid>
-              </div>
-              <Divider>
-                <Chip
-                  label="Datos de contacto en caso de emergencia"
-                  size="small"
-                />
-              </Divider>
-              <Grid item xs={6} sm={4}>
-                <TextField
-                  label="Nombre del contacto de emergencia"
-                  type="text"
-                  fullWidth
-                  inputProps={{ style: { textTransform: "uppercase" } }}
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  value={formValues.emergencia}
-                  onChange={(e) => {
-                    setFormValues({
-                      ...formValues,
-                      emergencia: e.target.value,
-                    });
-                    if (formErrors.emergencia && e.target.value.trim() !== "") {
-                      setFormErrors({ ...formErrors, emergencia: "" });
-                    }
-                  }}
-                  placeholder="Ej: José María López Hernández"
-                  error={!!formErrors.emergencia}
-                  helperText={formErrors.emergencia || ""}
-                />
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <p></p>
-                <MuiTelInput
-                  label="Teléfono de emergencia"
-                  fullWidth
-                  value={emergencia}
-                  variant="outlined"
-                  defaultCountry="MX"
-                  onChange={(e) => {
-                    setEmergencia(e);
-                    formValues.telef_emergencia = emergencia;
-                    if (
-                      formErrors.telef_emergencia &&
-                      emergencia.trim() !== ""
-                    ) {
-                      setFormErrors({ ...formErrors, telef_emergencia: "" });
-                    }
-                  }}
-                  inputProps={{ maxLength: 16 }}
-                  error={!!formErrors.telef_emergencia}
-                  helperText={formErrors.telef_emergencia || ""}
-                />
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <TextField
-                  label="Observaciones/Indicaciones"
-                  type="text"
-                  fullWidth
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  value={formValues.observaciones}
-                  onChange={(e) => {
-                    setFormValues({
-                      ...formValues,
-                      observaciones: e.target.value,
-                    });
-                    if (
-                      formErrors.observaciones &&
-                      e.target.value.trim() !== ""
-                    ) {
-                      setFormErrors({
-                        ...formErrors,
-                        observaciones: "",
-                      });
-                    }
-                  }}
-                  error={!!formErrors.observaciones}
-                  helperText={formErrors.observaciones || ""}
-                  placeholder="Indicaciones especiales (horario, parentesco) para el contacto de emergencia"
-                />
-              </Grid>
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={2}>
-              <Grid item xs={6} sm={4}>
-                <TextField
-                  label="Departamento"
-                  select
-                  fullWidth
-                  value={formValues.departamento}
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  onChange={(e) => {
-                    setFormValues({
-                      ...formValues,
-                      departamento: e.target.value,
-                    });
-                    if (formErrors.departamento && e.target.value !== "") {
-                      setFormErrors({
-                        ...formErrors,
-                        departamento: "",
-                      });
-                    }
-                  }}
+              </CustomTabPanel>
+              <CustomTabPanel value={value} index={4}>
+                <Grid
+                  container
+                  spacing={2}
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
                 >
-                  {departamento.map((item, index) => (
-                    <MenuItem key={index} value={item.id}>
-                      {item.nombre}
-                    </MenuItem>
-                  ))}
-                  error={!!formErrors.departamento}
-                  helperText={formErrors.departamento || ""}
-                </TextField>
-              </Grid>
-              <Grid item xs={6} sm={4}>
-                <Grid item xs={6} sm={4}>
-                  <TextField
-                    label="Puesto"
-                    select
-                    fullWidth
-                    margin="normal"
-                    value={formValues.puesto}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    onChange={(e) => {
-                      setFormValues({
-                        ...formValues,
-                        puesto: e.target.value,
-                      });
-                      if (formErrors.puesto && e.target.value !== "") {
-                        setFormErrors({
-                          ...formErrors,
-                          puesto: "",
-                        });
-                      }
-                    }}
-                  >
-                    {puesto.map((item, index) => (
-                      <MenuItem key={index} value={item.id}>
-                        {item.nombre}
-                      </MenuItem>
-                    ))}
-                    error={!!formErrors.puesto}
-                    helperText={formErrors.puesto || ""}
-                  </TextField>
-                </Grid>
-                <Grid item xs={6} sm={4}>
-                  <TextField
-                    label="Jefe inmediato"
-                    select
-                    fullWidth
-                    value={formValues.jefe}
-                    margin="normal"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    onChange={(e) => {
-                      setFormValues({
-                        ...formValues,
-                        jefe: e.target.value,
-                      });
-                      if (formErrors.jefe && e.target.value !== "") {
-                        setFormErrors({
-                          ...formErrors,
-                          jefe: "",
-                        });
-                      }
-                    }}
-                  >
-                    {puesto.map((item, index) => (
-                      <MenuItem key={index} value={item.id}>
-                        {item.nombre}
-                      </MenuItem>
-                    ))}
-                    error={!!formErrors.jefe}
-                    helperText={formErrors.jefe || ""}
-                  </TextField>
-                </Grid>
-                <Grid item xs={12}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <p></p>
-                      <FormControl fullWidth>
-                        <InputLabel htmlFor="outlined-adornment-amount">
-                          Salario
-                        </InputLabel>
-                        <OutlinedInput
-                          id="outlined-adornment-amount"
-                          startAdornment={
-                            <InputAdornment position="start">$</InputAdornment>
-                          }
-                          label="Salario"
-                          value={formValues.salario}
-                          onChange={(e) => {
-                            setFormValues({
-                              ...formValues,
-                              salario: e.target.value,
-                            });
-                            if (formErrors.salario && e.target.value !== "") {
-                              setFormErrors({ ...formErrors, salario: "" });
-                            }
-                          }}
-                          error={!!formErrors.salario}
-                          helperText={formErrors.salario || ""}
+                  <Grid item xs={6}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={["TimePicker"]}>
+                        <TimePicker
+                          margin="normal"
+                          fullWidth
+                          label="Hora de Entrada"
+                          value={entradaTiempo}
+                          onChange={(valor) => setEntradaTiempo(valor)}
                         />
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <DemoContainer components={["DatePicker"]}>
-                        <LocalizationProvider
-                          dateAdapter={AdapterDayjs}
-                          adapterLocale={es}
-                          localeText={spanishLocale}
-                        >
-                          <DatePicker
-                            margin="normal"
-                            fullWidth
-                            sx={{ width: "100%" }}
-                            label="Fecha de ingreso"
-                            value={formValues.fecha_ingreso}
-                            disableFuture
-                            onChange={(e) => {
-                              setFormValues({
-                                ...formValues,
-                                fecha_ingreso: dayjs(e).format("DD/MM/YYYY"),
-                              });
-                              if (
-                                formErrors.fecha_ingreso &&
-                                e.target.value !== ""
-                              ) {
-                                setFormErrors({
-                                  ...formErrors,
-                                  fecha_ingreso: "",
-                                });
-                              }
-                            }}
-                            slotProps={{
-                              textField: {
-                                helperText: `Antigüedad: ${dayjs().diff(
-                                  formValues.fecha_ingreso,
-                                  "year"
-                                )} años`,
-                              },
-                            }}
-                            error={!!formErrors.fecha_ingreso}
-                            helperText={formErrors.fecha_ingreso || ""}
-                          />
-                        </LocalizationProvider>
                       </DemoContainer>
-                    </Grid>
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={["TimePicker"]}>
+                        <TimePicker
+                          margin="normal"
+                          fullWidth
+                          label="Hora de Salida"
+                          value={salidaTiempo}
+                          onChange={(valor) => setSalidaTiempo(valor)}
+                        />
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={["TimePicker"]}>
+                        <TimePicker
+                          margin="normal"
+                          fullWidth
+                          label="Hora de Salida (COMIDA)"
+                          value={salidaComidaTiempo}
+                          onChange={(valor) => setSalidaComidaTiempo(valor)}
+                        />
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={["TimePicker"]}>
+                        <TimePicker
+                          margin="normal"
+                          fullWidth
+                          label="Hora de Entrada (COMIDA)"
+                          value={entradaComidaTiempo}
+                          onChange={(valor) => setEntradaComidaTiempo(valor)}
+                        />
+                      </DemoContainer>
+                    </LocalizationProvider>
                   </Grid>
                 </Grid>
-              </Grid>
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={3}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Nombre de usuario"
-                    fullWidth
-                    margin="normal"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    value={formValues.nombre_usuario}
-                    onChange={(e) => {
-                      setFormValues({
-                        ...formValues,
-                        nombre_usuario: e.target.value,
-                      });
-                      if (
-                        formErrors.nombre_usuario &&
-                        e.target.value.trim() !== ""
-                      ) {
-                        setFormErrors({
-                          ...formErrors,
-                          nombre_usuario: "",
-                        });
-                      }
-                    }}
-                    error={!!formErrors.nombre_usuario}
-                    helperText={formErrors.nombre_usuario || ""}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Contraseña"
-                    type="password"
-                    fullWidth
-                    margin="normal"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    value={formValues.contrasena}
-                    onChange={(e) => {
-                      setFormValues({
-                        ...formValues,
-                        contrasena: e.target.value,
-                      });
-                      if (
-                        formErrors.contrasena &&
-                        e.target.value.trim() !== ""
-                      ) {
-                        setFormErrors({
-                          ...formErrors,
-                          contrasena: "",
-                        });
-                      }
-                    }}
-                    error={!!formErrors.contrasena}
-                    helperText={formErrors.contrasena || ""}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Confirmar contraseña"
-                    type="password"
-                    fullWidth
-                    margin="normal"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    value={formValues.contrasena2}
-                    onChange={(e) => {
-                      setFormValues({
-                        ...formValues,
-                        contrasena2: e.target.value,
-                      });
-                      if (
-                        formErrors.contrasena2 &&
-                        e.target.value.trim() !== ""
-                      ) {
-                        setFormErrors({
-                          ...formErrors,
-                          contrasena2: "",
-                        });
-                      }
-                    }}
-                    error={!!formErrors.contrasena2}
-                    helperText={formErrors.contrasena2 || ""}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Rol"
-                    select
-                    fullWidth
-                    margin="normal"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  >
-                    <MenuItem label="Administrador" value="1">
-                      Administrador
-                    </MenuItem>
-                    <MenuItem label="Usuario" value="2">
-                      Usuario
-                    </MenuItem>
-                    <MenuItem label="Invitado" value="3">
-                      Invitado
-                    </MenuItem>
-                  </TextField>
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    label="Tiempo de innactividad"
-                    type="number"
-                    fullWidth
-                    margin="normal"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="start">horas</InputAdornment>
-                      ),
-                    }}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    value={formValues.tiempo_innactivo}
-                    onChange={(e) => {
-                      setFormValues({
-                        ...formValues,
-                        tiempo_innactivo: e.target.value,
-                      });
-                      if (
-                        formErrors.tiempo_innactivo &&
-                        e.target.value.trim() !== ""
-                      ) {
-                        setFormErrors({
-                          ...formErrors,
-                          tiempo_innactivo: "",
-                        });
-                      }
-                    }}
-                    error={!!formErrors.tiempo_innactivo}
-                    helperText={formErrors.tiempo_innactivo || ""}
-                  />
-                </Grid>
-              </Grid>
-            </CustomTabPanel>
-            <CustomTabPanel value={value} index={4}>
-              <Grid
-                container
-                spacing={2}
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-              >
-                <Grid item xs={6}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={["TimePicker"]}>
-                      <TimePicker
-                        margin="normal"
-                        fullWidth
-                        label="Hora de Entrada"
-                        value={entradaTiempo}
-                        onChange={(valor) => setEntradaTiempo(valor)}
-                      />
-                    </DemoContainer>
-                  </LocalizationProvider>
-                </Grid>
-                <Grid item xs={6}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={["TimePicker"]}>
-                      <TimePicker
-                        margin="normal"
-                        fullWidth
-                        label="Hora de Salida"
-                        value={salidaTiempo}
-                        onChange={(valor) => setSalidaTiempo(valor)}
-                      />
-                    </DemoContainer>
-                  </LocalizationProvider>
-                </Grid>
-                <Grid item xs={6}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={["TimePicker"]}>
-                      <TimePicker
-                        margin="normal"
-                        fullWidth
-                        label="Hora de Salida (COMIDA)"
-                        value={salidaComidaTiempo}
-                        onChange={(valor) => setSalidaComidaTiempo(valor)}
-                      />
-                    </DemoContainer>
-                  </LocalizationProvider>
-                </Grid>
-                <Grid item xs={6}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={["TimePicker"]}>
-                      <TimePicker
-                        margin="normal"
-                        fullWidth
-                        label="Hora de Entrada (COMIDA)"
-                        value={entradaComidaTiempo}
-                        onChange={(valor) => setEntradaComidaTiempo(valor)}
-                      />
-                    </DemoContainer>
-                  </LocalizationProvider>
-                </Grid>
-              </Grid>
-            </CustomTabPanel>
-          </Box>
-        </form>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={props.handleClose}>Cerrar</Button>
-        <Button
-          type="submit"
-          color="primary"
-          variant="contained"
-        >
-          Adicionar
-        </Button>
-      </DialogActions>
-    </Dialog>
-    <Snackbar
+              </CustomTabPanel>
+            </Box>
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={props.handleClose}>Cerrar</Button>
+          <Button type="submit" color="primary" variant="contained">
+            Adicionar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
         open={mopen}
         autoHideDuration={6000}
         onClose={handleCloseSnack}

@@ -10,7 +10,6 @@ export default function Proveedor() {
   const [rows, setRows] = useState([]);
   const [show, setShow] = useState(false);
 
-
   const columns = [
     { field: "id", headerName: "ID", width: 40 },
     {
