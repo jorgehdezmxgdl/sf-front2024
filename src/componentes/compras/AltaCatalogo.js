@@ -1,4 +1,4 @@
-import React, {useRef } from "react";
+import React, { useRef } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -15,23 +15,35 @@ import {
   Typography,
   Card,
   CardMedia,
+  MenuItem,
   CardActions,
   IconButton,
 } from "@mui/material";
 
 import PropTypes from "prop-types";
 
+import axios from "axios";
+
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-
 
 export default function AltaCatalogo(props) {
   const [open, setOpen] = React.useState(true);
   const [value, setValue] = React.useState(0);
   const [images, setImages] = React.useState([]);
+  const [paises, setPaises] = React.useState([]);
+  const [disenador, setDisenador] = React.useState([]);
+  const [ml, setMl] = React.useState([]);
+  const [producto, setProducto] = React.useState({
+    largo: 0,
+    ancho: 0,
+    alto: 0,
+    volumen: 0,
+    pais: "75",
+  });
 
-  const labels = ['Figura1', 'Figura2', 'Figura3', 'Figura4'];
+  const labels = ["Portada", "Caja", "Perfume", "Ambos"];
 
   CustomTabPanel.propTypes = {
     children: PropTypes.node,
@@ -65,6 +77,37 @@ export default function AltaCatalogo(props) {
     );
   }
 
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5784/paises`);
+        const data = response.data;
+        setPaises(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:5784/disenador`);
+        const data = response.data;
+        setDisenador(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:5784/ml`);
+        const data = response.data;
+        setMl(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+
+
+    };
+    fetchData();
+  }, []);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -80,7 +123,10 @@ export default function AltaCatalogo(props) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImages((prevImages) => [...prevImages, { src: reader.result, file }]);
+        setImages((prevImages) => [
+          ...prevImages,
+          { src: reader.result, file },
+        ]);
       };
       reader.readAsDataURL(file);
     }
@@ -100,15 +146,37 @@ export default function AltaCatalogo(props) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImages((prevImages) =>
-          prevImages.map((img, i) => (i === index ? { src: reader.result, file } : img))
+          prevImages.map((img, i) =>
+            i === index ? { src: reader.result, file } : img
+          )
         );
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const handleCalculaVolumen = () => {
+    try {
+      const volumen =
+        parseFloat(producto.largo) *
+        parseFloat(producto.ancho) *
+        parseFloat(producto.alto);
+      setProducto({ ...producto, volumen: volumen.toFixed(2) });
+    } catch (error) {
+      console.error("Error al buscar datos:", error);
+      alert("Error al buscar datos: " + error);
+    }
+  };
+
+  
+
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
       <DialogTitle id={"id10"}>Alta de nuevo producto</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -144,6 +212,7 @@ export default function AltaCatalogo(props) {
                   <Grid item xs={12} sm={12}>
                     <TextField
                       margin="normal"
+                      select
                       id="disenador"
                       label="Diseñador"
                       type="text"
@@ -151,7 +220,13 @@ export default function AltaCatalogo(props) {
                       InputLabelProps={{
                         shrink: true,
                       }}
-                    />
+                    >
+                      {disenador.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>
+                          {item.nombre}
+                        </MenuItem>
+                      ))}
+                    </TextField>
                   </Grid>
                 </Grid>
                 <Grid container spacing={2}>
@@ -173,13 +248,17 @@ export default function AltaCatalogo(props) {
                     <Grid item xs={12} sm={4}>
                       <TextField
                         label="Alto"
+                        value={producto.alto}
                         fullWidth
-                        type="number"
+                        type="text"
                         margin="normal"
                         InputProps={{
                           endAdornment: (
                             <InputAdornment position="start">cm</InputAdornment>
                           ),
+                        }}
+                        onChange={(e) => {
+                          setProducto({ ...producto, alto: e.target.value });
                         }}
                         InputLabelProps={{
                           shrink: true,
@@ -189,8 +268,9 @@ export default function AltaCatalogo(props) {
                     <Grid item xs={6} sm={4}>
                       <TextField
                         label="Largo"
+                        value={producto.largo}
                         fullWidth
-                        type="number"
+                        type="text"
                         margin="normal"
                         InputProps={{
                           endAdornment: (
@@ -199,13 +279,17 @@ export default function AltaCatalogo(props) {
                         }}
                         InputLabelProps={{
                           shrink: true,
+                        }}
+                        onChange={(e) => {
+                          setProducto({ ...producto, largo: e.target.value });
                         }}
                       />
                     </Grid>
                     <Grid item xs={6} sm={4}>
                       <TextField
                         label="Ancho"
-                        type="number"
+                        value={producto.ancho}
+                        type="text"
                         fullWidth
                         margin="normal"
                         InputProps={{
@@ -216,6 +300,10 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
+                        onChange={(e) => {
+                          setProducto({ ...producto, ancho: e.target.value });
+                        }}
+                        onBlur={handleCalculaVolumen}
                       />
                     </Grid>
                   </Grid>
@@ -225,10 +313,18 @@ export default function AltaCatalogo(props) {
                     <Grid item xs={12} sm={6}>
                       <TextField
                         label="Volumen"
+                        value={producto.volumen}
                         fullWidth
+                        type="text"
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
+                        }}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="start">cm<sub>3</sub></InputAdornment>
+                          ),
+                          readOnly: true,
                         }}
                       />
                     </Grid>
@@ -289,11 +385,18 @@ export default function AltaCatalogo(props) {
                       <TextField
                         label="ML"
                         fullWidth
+                        select
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                      />
+                      >
+                       {ml.map((item, index) => (
+                         <MenuItem key={index} value={item.id}>
+                           {item.nombre}
+                          </MenuItem>
+                       ))} 
+                      </TextField>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -302,12 +405,20 @@ export default function AltaCatalogo(props) {
                     <Grid item xs={12} sm={12}>
                       <TextField
                         label="País de origen"
+                        value={producto.pais}
                         fullWidth
+                        select
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                      />
+                      >
+                        {paises.map((item, index) => (
+                          <MenuItem key={index} value={item.id}>
+                            {item.nombre}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -349,7 +460,8 @@ export default function AltaCatalogo(props) {
                         fullWidth
                         margin="normal"
                         InputProps={{
-                          inputMode: 'numeric', pattern: '[0-9]*',
+                          inputMode: "numeric",
+                          pattern: "[0-9]*",
                           endAdornment: (
                             <InputAdornment position="start">
                               pzs
@@ -367,7 +479,8 @@ export default function AltaCatalogo(props) {
                         fullWidth
                         margin="normal"
                         InputProps={{
-                          inputMode: 'numeric', pattern: '[0-9]*',
+                          inputMode: "numeric",
+                          pattern: "[0-9]*",
                           endAdornment: (
                             <InputAdornment position="start">
                               pzs
