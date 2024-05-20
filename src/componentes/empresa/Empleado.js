@@ -223,12 +223,20 @@ export default function Empleado(props) {
 
   const insertEmployee = async () => {
     console.log(formValues);
+    console.log("adsdsd");
     try {
       const response = await axios.post(
         "http://localhost:5784/empleados",
         formValues
       );
+      alert(response.data.mensaje);
+      console.log("respeusta", response);
+      initializeForm();
+      setMessage("Empleado registrado correctamente");
+      setAviso("success");
+      setMOpen(true);
     } catch (error) {
+      alert("Error: " + error);
       if (error.response) {
         // Asegúrate de que el mensaje de error es un string
         setMessage(
@@ -342,6 +350,39 @@ export default function Empleado(props) {
       }
     } catch (error) {
       console.error("Error al buscar datos:", error);
+    }
+  }
+
+  const handleCreatePassword = () => {
+    const passw1 = formValues.contrasena;
+    const passw2 = formValues.contrasena2;
+    if (passw1.length > 0 && passw2.length > 0) {
+      if (passw1 !== passw2) {
+        setMessage("Las contraseñas no coinciden");
+        setAviso("error");
+        setMOpen(true);
+      }
+    }
+  };
+
+  const  handleUserifExists = async () => {
+    const user = formValues.nombre_usuario;
+    if (user.length > 0) {
+      try {
+        const response = await axios.post(
+          "http://localhost:5784/empleados/usuario",
+          {
+            clave: user,
+          }
+        );
+        if (!Array.isArray(response.data)) {
+          setMessage("El nombre de usuario ya existe");
+          setAviso("error");
+          setMOpen(true);
+        }
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
     }
   }
 
@@ -1328,6 +1369,7 @@ export default function Empleado(props) {
                           });
                         }
                       }}
+                      onBlur={handleUserifExists}
                       error={!!formErrors.nombre_usuario}
                       helperText={formErrors.nombre_usuario || ""}
                     />
@@ -1357,6 +1399,7 @@ export default function Empleado(props) {
                           });
                         }
                       }}
+                      onBlur={handleCreatePassword}
                       error={!!formErrors.contrasena}
                       helperText={formErrors.contrasena || ""}
                     />
@@ -1386,6 +1429,7 @@ export default function Empleado(props) {
                           });
                         }
                       }}
+                      onBlur={handleCreatePassword}
                       error={!!formErrors.contrasena2}
                       helperText={formErrors.contrasena2 || ""}
                     />
