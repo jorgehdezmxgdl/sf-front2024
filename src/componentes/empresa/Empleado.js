@@ -126,7 +126,7 @@ export default function Empleado(props) {
     tipo_sangre: "",
     domicilio: "",
     observaciones: "",
-    codigo_postal: "",
+    cp: "",
     estadosPais: "14",
     municipio: "",
     colonia: "",
@@ -185,7 +185,7 @@ export default function Empleado(props) {
       tipo_sangre: "",
       domicilio: "",
       observaciones: "",
-      codigo_postal: "",
+      cp: "",
       estadosPais: "14",
       municipio: "",
       colonia: "",
@@ -205,40 +205,42 @@ export default function Empleado(props) {
     setFormErrors({});
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
     const errores = {};
     const camposVacios = encontrarCamposVacios();
+    alert(camposVacios.length);
     if (camposVacios.length > 0) {
       camposVacios.map((campo) => {
         errores[campo] = " es obligatorio este dato";
         return null;
       });
       setFormErrors(errores);
+      setMessage("Faltan campos por llenar");
+      setAviso("error");
+      setMOpen(true);
     } else {
+      if (formValues.pais === 'MX') { 
+         setFormValues({...formValues, pais: 120});
+      }
       insertEmployee();
-      props.handleClose();
       initializeForm();
+      props.handleClose();
     }
   };
 
   const insertEmployee = async () => {
-    console.log(formValues);
-    console.log("adsdsd");
     try {
       const response = await axios.post(
         "http://localhost:5784/empleados",
         formValues
       );
-      alert(response.data.mensaje);
-      console.log("respeusta", response);
-      initializeForm();
-      setMessage("Empleado registrado correctamente");
-      setAviso("success");
-      setMOpen(true);
+      if (response) {
+        setMessage("Empleado registrado correctamente");
+        setAviso("success");
+        setMOpen(true);
+      }
     } catch (error) {
-      alert("Error: " + error);
       if (error.response) {
-        // Asegúrate de que el mensaje de error es un string
         setMessage(
           error.response.data.mensaje || "Ocurrió un error desconocido"
         );
@@ -345,6 +347,7 @@ export default function Empleado(props) {
             estadosPais: data[0].tcodestados.id,
             colonia: data[0].id,
             municipio: data[0].tcodmunicipios.id,
+            cp: my_cp,
           });
         }
       }
@@ -934,15 +937,11 @@ export default function Empleado(props) {
                         getOptionLabel={(option) => option.cp.toString()}
                         options={options}
                         noOptionsText="Escriba un código postal"
-                        inputValue={inputValue || formValues.codigo_postal}
+                        inputValue={inputValue || formValues.cp}
                         onInputChange={(event, newInputValue) => {
                           setInputValue(newInputValue);
                           if (newInputValue.length === 5) {
                             completeAddress(newInputValue);
-                            setFormValues({
-                              ...formValues,
-                              codigo_postal: newInputValue,
-                            });
                           }
                         }}
                         onClick={() => {}}

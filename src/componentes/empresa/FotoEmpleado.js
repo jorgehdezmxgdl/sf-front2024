@@ -66,7 +66,6 @@ export default function FotoEmpleado(props) {
       const reader = new FileReader();
       reader.onload = (e) => {
         setImgSrc(e.target.result); 
-        console.log(e.target.result);
       };
       reader.readAsDataURL(file);
     }
