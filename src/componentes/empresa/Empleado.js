@@ -223,10 +223,7 @@ export default function Empleado(props) {
          setFormValues({...formValues, pais: 120});
       }
       insertEmployee();
-<<<<<<< Updated upstream
       initializeForm();
-=======
->>>>>>> Stashed changes
       props.handleClose();
     }
   };
@@ -237,19 +234,15 @@ export default function Empleado(props) {
         "http://localhost:5784/empleados",
         formValues
       );
-<<<<<<< Updated upstream
       if (response) {
         setMessage("Empleado registrado correctamente");
         setAviso("success");
         setMOpen(true);
       }
-=======
-      console.log("respeusta", response);
       initializeForm();
       setMessage("Empleado registrado correctamente");
       setAviso("success");
       setMOpen(true);
->>>>>>> Stashed changes
     } catch (error) {
       if (error.response) {
         setMessage(
