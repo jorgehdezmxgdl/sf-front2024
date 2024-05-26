@@ -67,6 +67,16 @@ function a11yProps(index) {
 }
 
 export default function Empleado(props) {
+
+  const { isReadOnly } = props;
+
+  console.log('isReadOnly', isReadOnly);
+
+  const inputProps = {
+    style: { textTransform: "uppercase" },
+    readOnly: isReadOnly
+  };
+
   const [value, setValue] = React.useState(0);
   const [telef_casa, setTelCasa] = React.useState("");
   const [telef_mobile, setTelMovil] = React.useState("");
@@ -80,7 +90,7 @@ export default function Empleado(props) {
   const [listadoMunicipios, setListadoMunicipios] = React.useState([]);
   const [colonias, setColonias] = React.useState([]);
   const [foto, setFoto] = React.useState(null);
-
+ 
   const [mopen, setMOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [aviso, setAviso] = React.useState("");
@@ -219,9 +229,6 @@ export default function Empleado(props) {
       setAviso("error");
       setMOpen(true);
     } else {
-      if (formValues.pais === 'MX') { 
-         setFormValues({...formValues, pais: 120});
-      }
       insertEmployee();
       initializeForm();
       props.handleClose();
@@ -372,7 +379,7 @@ export default function Empleado(props) {
     }
   };
 
-  const  handleUserifExists = async () => {
+  const handleUserifExists = async () => {
     const user = formValues.nombre_usuario;
     if (user.length > 0) {
       try {
@@ -391,10 +398,11 @@ export default function Empleado(props) {
         console.error("Error al buscar datos:", error);
       }
     }
-  }
+  };
 
   return (
     <>
+      const lectura = props.isReadOnly;
       <Dialog
         open={props.open}
         maxWidth={"md"}
@@ -444,13 +452,16 @@ export default function Empleado(props) {
           },
         }}
       >
-        <DialogTitle>Alta de empleado</DialogTitle>
+        <DialogTitle>
+           {isReadOnly === true ? "Consulta " : "Alta "}
+           de empleado
+        </DialogTitle>
         <DialogContent>
           <DialogContentText>
             Complete la siguiente información para incorporar una persona a
             nuestra compañia
           </DialogContentText>
-          <form>
+          <form> 
             <Box sx={{ width: "100%" }}>
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                 <Tabs
@@ -493,7 +504,7 @@ export default function Empleado(props) {
                               setFormErrors({ ...formErrors, nombre: "" });
                             }
                           }}
-                          inputProps={{ style: { textTransform: "uppercase" } }}
+                          inputProps={inputProps}
                           error={!!formErrors.nombre}
                           helperText={formErrors.nombre || ""}
                         />
@@ -501,6 +512,7 @@ export default function Empleado(props) {
                       <Grid item xs={6} sm={4}>
                         <TextField
                           label="Apellido Paterno"
+                          readOnly={props.isReadOnly}
                           fullWidth
                           margin="normal"
                           InputLabelProps={{
@@ -530,6 +542,7 @@ export default function Empleado(props) {
                       <Grid item xs={6} sm={4}>
                         <TextField
                           label="Apellido Materno"
+                          readOnly={props.isReadOnly}
                           fullWidth
                           margin="normal"
                           InputLabelProps={{
@@ -1563,9 +1576,12 @@ export default function Empleado(props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={props.handleClose}>Cerrar</Button>
-          <Button type="submit" color="primary" variant="contained">
+          {!isReadOnly && (<Button type="submit" 
+                  
+                  color="primary" variant="contained">
             Adicionar
           </Button>
+          )}
         </DialogActions>
       </Dialog>
       <Snackbar

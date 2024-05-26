@@ -13,7 +13,6 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import PermContactCalendarIcon from '@mui/icons-material/PermContactCalendar';
 import MiModulo from "./Modulo";
 import Empleado from "./Empleado";
 
@@ -21,8 +20,10 @@ function MyComponent(props) {
   const [open, setOpen] = React.useState(false);
   const [fetchTrigger, setFetchTrigger] = useState(0);
   const [rows, setRows] = useState([]);  
-  const [show, setShow] = useState("none"); // 'none', 'table' or 'image'
-  
+  const [show, setShow] = useState("none"); 
+  const [isReadOnly, setIsReadOnly] = useState(false); 
+  const [mdata, setMdata] = useState({});
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,10 +38,24 @@ function MyComponent(props) {
   }, [fetchTrigger]); 
   
   const handleClickOpen = async (params) => {
-    const employeeId = params.row.id;
-    await axios.get('http://127.0.0.1:5784/empleados', { params: { id: employeeId } });
-    setOpen(true);
+     setIsReadOnly(false);
+     setOpen(true);
   };
+
+  const handleRowClickOpen = async (params) => {
+    try {
+      const employeeId = params.row.id;
+      const response = await axios.get('http://127.0.0.1:5784/empleados/busca', { params: { id: employeeId } });
+      if (response) {
+        setIsReadOnly(true);
+        setMdata(response.data);
+        setOpen(true);
+      }
+    } catch (error) {
+      console.error('Error al obtener los datos:', error);
+    }
+  }
+
 
   const handleClose = () => {    
     setOpen(false);
@@ -217,12 +232,12 @@ function MyComponent(props) {
               },
             }}
             pageSizeOptions={[5]}
-            onRowClick={handleClickOpen}
+            onRowClick={handleRowClickOpen}
           />
         </Box>
       )}      
       {show === "image" && <MiModulo />}
-      <Empleado open={open} handleClose={handleClose} />
+      <Empleado isReadOnly={isReadOnly}  mdata={mdata}  open={open} handleClose={handleClose} />
     </div>
   );
 }
