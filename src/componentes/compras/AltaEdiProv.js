@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Dialog from "@mui/material/Dialog";
+import Autocomplete from "@mui/material/Autocomplete";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -13,10 +14,19 @@ import { Grid, MenuItem, TextField } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
 
 import PropTypes from "prop-types";
+import axios from "axios";
 
 export default function AltaEdiProv(props) {
   const [open, setOpen] = React.useState(true);
   const [value, setValue] = React.useState(0);
+  const [cpListado, setcpListado] = React.useState([]);
+  const [inputValue, setInputValue] = React.useState("");
+  const [colonias, setColonias] = React.useState([]);
+  const [municipios, setMunicipios] = React.useState([]);
+  const [entrada, setEntrada] = React.useState(false);
+
+  const textFieldRef = useRef(null);
+
 
   function CustomTabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -59,6 +69,61 @@ export default function AltaEdiProv(props) {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post(`http://localhost:5784/cp`, {
+          mcp: inputValue,
+        });
+        const data = response.data;
+        setcpListado(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+    };
+    console.log("entra");
+    if (inputValue.length >= 3) {
+      fetchData();
+      console.log("estoy adeetro");
+    }
+  }, [inputValue]);
+
+  React.useEffect(() => {
+    if (inputValue.length < 5 && textFieldRef.current) {
+      textFieldRef.current.focus();
+    }
+  }, [inputValue.length]);
+
+
+  async function completeAddress(my_cp) {
+    try {
+      const response = await axios.post(`http://localhost:5784/cp-plus`, {
+        mcp: my_cp,
+      });
+      const data = response.data;
+      console.log("data", data);
+      if (data) {
+        const municipiosUnicos = [];
+        const municipiosVistos = new Set();
+        data.forEach((item) => {
+          if (!municipiosVistos.has(item.tcodmunicipios.municipio)) {
+            municipiosUnicos.push(item);
+            municipiosVistos.add(item.tcodmunicipios.municipio);
+          }
+        });
+        console.log("municipiosUnicos", municipiosUnicos);
+        console.log("colonias", data);
+        setColonias(data);
+        setMunicipios(municipiosUnicos);
+        if (data.length > 0) {
+          console.log("entra");
+        }
+      }
+    } catch (error) {
+      console.error("Error al buscar datos:", error);
+    }
+  }
 
   return (
     <Dialog open={open} onClose={handleClose}>
@@ -172,22 +237,34 @@ export default function AltaEdiProv(props) {
                     />
                   </Grid>
                   <Grid item xs={12} sm={4}>
-                    <TextField
-                      fullWidth
-                      id="cp"
-                      label="Código Postal"
-                      type="number"
-                      InputLabelProps={{
-                        shrink: true,
+                    <Autocomplete
+                      value={inputValue}
+                      options={cpListado.map((option) => option.cp)}
+                      onInputChange={(event, newInputValue) => {
+                        setInputValue(newInputValue);
+                        setEntrada(true);
+                        if (newInputValue.length === 5 && entrada) {
+                          completeAddress(newInputValue);
+                          setEntrada(false);
+                        }
                       }}
-                      variant="outlined"
-                      margin="normal"
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Código Postal"
+                          margin="normal"
+                          variant="outlined"
+                          inputRef={textFieldRef}
+                          InputLabelProps={{ shrink: true }}
+                        />
+                      )}
                     />
                   </Grid>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
+                    select
                     id="colonia"
                     label="Colonia"
                     InputLabelProps={{
@@ -195,11 +272,19 @@ export default function AltaEdiProv(props) {
                     }}
                     variant="outlined"
                     margin="normal"
-                  />
+                  >
+                    {colonias.map((item, index) => (
+                      <MenuItem key={index} value={item.id}>
+                        {item.colonia}
+                      </MenuItem>
+                    ))}
+                    <MenuItem value="0">Otro</MenuItem>
+                  </TextField>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
+                    select
                     id="municipio"
                     label="Municipio"
                     InputLabelProps={{
@@ -207,7 +292,14 @@ export default function AltaEdiProv(props) {
                     }}
                     variant="outlined"
                     margin="normal"
-                  />
+                  >
+                    {municipios.map((item, index) => (
+                      <MenuItem key={index} value={item.id}>
+                        {item.municipio}
+                      </MenuItem>
+                    ))}
+                    <MenuItem value="0">Otro</MenuItem>
+                  </TextField>
                 </Grid>
               </Grid>
               <Grid item xs={12} md={6}>
@@ -266,17 +358,17 @@ export default function AltaEdiProv(props) {
                   </Grid>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  id="contacto"
-                  label="Nombre del contacto"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  variant="outlined"
-                  margin="normal"
-                />
-              </Grid>
+                  <TextField
+                    fullWidth
+                    id="contacto"
+                    label="Nombre del contacto"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    variant="outlined"
+                    margin="normal"
+                  />
+                </Grid>
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={6}>
                     <TextField

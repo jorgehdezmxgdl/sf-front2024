@@ -1007,7 +1007,7 @@ export default function Empleado(props) {
                             {item.colonia}
                           </MenuItem>
                         ))}
-                        <MenuItem value="O">Otro</MenuItem>
+                        <MenuItem value="0">Otro</MenuItem>
                       </TextField>
                     </Grid>
                     <Grid item xs={6} sm={4}>
@@ -1040,7 +1040,7 @@ export default function Empleado(props) {
                             {item.tcodmunicipios.municipio}
                           </MenuItem>
                         ))}
-                        <MenuItem value="O">Otro</MenuItem>
+                        <MenuItem value="0">Otro</MenuItem>
                       </TextField>
                     </Grid>
                   </Grid>
