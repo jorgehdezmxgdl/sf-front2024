@@ -54,6 +54,9 @@ export default function Nested(props) {
       props.handleShow(5);
   };
 
+  const handleCompra_Orden = () => {
+      props.handleShow(6);
+  };
   
   return (
     <List
@@ -111,7 +114,7 @@ export default function Nested(props) {
             <ListItemIcon>
               <LocalMallIcon />
             </ListItemIcon>
-            <ListItemText primary="Órdenes de compra" />
+            <ListItemText primary="Órdenes de compra" onClick={handleCompra_Orden}/>
           </ListItemButton>
         </List>
         <List component="div" disablePadding>

@@ -18,6 +18,7 @@ import Nested from "./Nested";
 import Proveedor from "../compras/Proveedor";
 import Catalogo from "../compras/Catalogo";
 import Requisicion from "../compras/Requisicion";
+import Compra from "../compras/Compra";
 
 const drawerWidth = 240;
 
@@ -30,7 +31,8 @@ export default function App() {
     2: MenuConfig,
     3: Proveedor,
     4: Catalogo,
-    5: Requisicion
+    5: Requisicion,
+    6: Compra
   };
 
   const toggleDrawer = () => {
