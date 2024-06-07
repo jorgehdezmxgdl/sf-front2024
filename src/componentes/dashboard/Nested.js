@@ -24,6 +24,7 @@ import FaceIcon from '@mui/icons-material/Face';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import DoorFrontIcon from '@mui/icons-material/DoorFront';
 
+
 export default function Nested(props) {
   const [show, setShow]     = React.useState(0);
 
@@ -56,6 +57,10 @@ export default function Nested(props) {
 
   const handleCompra_Orden = () => {
       props.handleShow(6);
+  };
+
+  const handleImprimir = () => {
+      props.handleShow(7);
   };
   
   return (
@@ -130,7 +135,7 @@ export default function Nested(props) {
             <ListItemIcon>
               <PublicIcon />
             </ListItemIcon>
-            <ListItemText primary="Importaciones" />
+            <ListItemText primary="Importaciones" onClick={handleImprimir} />
           </ListItemButton>
         </List>
         <List component="div" disablePadding>

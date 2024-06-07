@@ -19,6 +19,7 @@ import Proveedor from "../compras/Proveedor";
 import Catalogo from "../compras/Catalogo";
 import Requisicion from "../compras/Requisicion";
 import Compra from "../compras/Compra";
+import Visor from "../utilities/Visor";
 
 const drawerWidth = 240;
 
@@ -32,7 +33,8 @@ export default function App() {
     3: Proveedor,
     4: Catalogo,
     5: Requisicion,
-    6: Compra
+    6: Compra,
+    7: Visor,
   };
 
   const toggleDrawer = () => {
