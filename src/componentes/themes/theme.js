@@ -1,10 +1,12 @@
 import { createTheme  } from '@mui/material/styles';
 
+//https://www.cdmon.com/es/apps/tabla-colores
+
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#2D2B23', // Copper
-      contrastText: '#FFF', // White Smoke for text on primary
+      main: '#4682B4', // Copper
+      contrastText: '#fff', // White Smoke for text on primary
     },
     secondary: {
       main: '#574E40', // Dark Charcoal

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Button, Grid } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import AltaRequisicion from "./AltaRequisicion";
+import LevantaRequisicion from "./LevantaRequisicion";
 
 export default function Requisicion() {
   const [rows, setRows] = useState([]);
@@ -78,7 +78,7 @@ export default function Requisicion() {
           />
         </Box>
       </Box>
-      { show ?  <AltaRequisicion  handleCloseDialog={handleCloseDialog} /> : null}
+      { show ?  <LevantaRequisicion  handleCloseDialog={handleCloseDialog} /> : null}
     </div>
   );
 }
