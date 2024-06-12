@@ -28,14 +28,13 @@ import BuscaProveedor from "./BuscaProveedor";
 
 export default function LevantaRequisicion(props) {
   const [open, setOpen] = React.useState(true);
-  const [open2, setOpen2] = React.useState(false);
   const [totalPurchase, setTotalPurchase] = React.useState(0);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [listado, setListado] = React.useState([]);
   const [value, setValue] = React.useState("1");
   const [autocompleteValue, setAutocompleteValue] = React.useState(null);
-
+  let   valor = 0;	
 
   function isObject(variable) {
     return variable !== null && typeof variable === 'object';
@@ -52,10 +51,6 @@ export default function LevantaRequisicion(props) {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-  };
-
-  const handleCloseDialog2 = () => {
-    setOpen2(false);
   };
 
   const handleClose = () => {
@@ -189,6 +184,16 @@ export default function LevantaRequisicion(props) {
     },
   ];
 
+  const [open2, setOpen2] = React.useState(false);
+
+  const handleClickOpen2 = () => {
+    setOpen2(true);
+  };
+
+  const handleCloseOpen2 = () => {
+    setOpen2(false);
+  };
+
   return (
     <>
       <Dialog
@@ -219,7 +224,7 @@ export default function LevantaRequisicion(props) {
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
                       <Box style={{ flexGrow: 1 }}>
-                        <Button onClick={() => setOpen2(true)}>
+                        <Button onClick={handleClickOpen2}>
                           <AddIcon />
                         </Button>
                         <DataGrid
@@ -260,7 +265,7 @@ export default function LevantaRequisicion(props) {
           </Button>
         </DialogActions>
       </Dialog>
-      <BuscaProveedor open2={open2} />
-    </>
+      {open2 && <BuscaProveedor handleCloseOpen2={handleCloseOpen2} open2={open2} />}
+    </>  
   );
 }
