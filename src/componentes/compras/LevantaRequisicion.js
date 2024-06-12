@@ -24,6 +24,7 @@ import TabPanel from "@mui/lab/TabPanel";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
+import BuscaProveedor from "./BuscaProveedor";
 
 export default function LevantaRequisicion(props) {
   const [open, setOpen] = React.useState(true);
@@ -77,7 +78,6 @@ export default function LevantaRequisicion(props) {
   const fetchData = async () => {
     try {
       const response = await axios.get("http://localhost:5784/disenador2");
-      console.log(response.data);
       setListado(response.data || []);
     } catch (error) {
       console.error("Error al buscar datos:", error);
@@ -260,61 +260,7 @@ export default function LevantaRequisicion(props) {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={open2} onClose={handleCloseDialog2}>
-        <DialogTitle id={"jorg"}></DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            <Grid item md={4}>
-              <Box display="flex" flexDirection="row" gap="10px">
-                <Autocomplete
-                  id="grouped-mx"
-                  options={listado}
-                  getOptionLabel={(option) => option.label}
-                  fullWidth
-                  margin="normal"
-                  value={listado.find(option => option.label === autocompleteValue) || null}
-                onChange={handleAutocompleteChange}
-                isOptionEqualToValue={(option, value) => option.label === value?.label}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Nombre del producto" />
-                  )}
-                />
-                <TextField
-                  label="Cantidad"
-                  type="number"
-                  value={newRow.quantity}
-                  onChange={(e) =>
-                    setNewRow({ ...newRow, quantity: e.target.value })
-                  }
-                  fullWidth
-                />
-                <TextField
-                  label="Precio"
-                  type="number"
-                  value={newRow.price}
-                  onChange={(e) =>
-                    setNewRow({ ...newRow, price: e.target.value })
-                  }
-                  fullWidth
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddRow}
-                >
-                  Añadir Producto
-                </Button>
-              </Box>
-            </Grid>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog2} color="primary">
-            Cerrar
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <BuscaProveedor open2={open2} />
     </>
   );
 }
