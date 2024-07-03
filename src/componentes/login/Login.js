@@ -21,7 +21,7 @@ import * as React from "react";
 import axios from "axios";
 
 import theme from "../themes/theme";
-import logo from "./fondo3.webp";
+import logo from "./logo2.jpeg";
 import milogo from "./milogo.png";
 
 function Copyright(props) {
@@ -161,8 +161,7 @@ export default function SignInSide(props) {
     await axios
       .post("http://127.0.0.1:5784/login", info)
       .then((response) => {
-        console.log(response.status, "ok");
-        if (response.status === 204) {
+         if (response.status === 204) {
           setMessage("Usuario/Contraseña no válidos...");
           setMOpen(true);
           setMError("error");

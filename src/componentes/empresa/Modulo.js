@@ -17,6 +17,7 @@ import {
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
+import { LocaleText } from '../utilities/LocaleText';
 
 import axios from "axios";
 
@@ -67,7 +68,34 @@ export default function MiModulo(props) {
       headerAlign: "center",
       cellClassName: "actions-cell",
       width: 450,
-      renderCell: (params) => {},
+      renderCell: (params) => {
+        return (
+          <div>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              style={{ marginLeft: 16 }}
+              onClick={() => {
+                console.log("Editar módulo con ID:", params.row.id);
+              }}
+            >
+              Editar
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="small"
+              style={{ marginLeft: 16 }}
+              onClick={() => {
+                console.log("Eliminar módulo con ID:", params.row.id);
+              }}
+            >
+              Eliminar
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 
@@ -84,7 +112,11 @@ export default function MiModulo(props) {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:5784/modulos');
-        setRows(response.data); // Asegúrate de que response.data contiene el array de filas esperado       
+        if (response.status === 200) {
+           setRows(response.data);
+        } else {
+
+        }     
       } catch (error) {
         console.error('Error al obtener los datos:', error);
         // Puedes manejar errores o mostrar mensajes de error aquí
@@ -119,6 +151,7 @@ export default function MiModulo(props) {
             pageSize={15}
             rowsPerPageOptions={[5, 10, 15, 20]}
             checkboxSelection
+            localeText={LocaleText}
             disableSelectionOnClick
             initialState={{
               pagination: {
@@ -132,6 +165,7 @@ export default function MiModulo(props) {
                 outline: "none",
               },
             }}
+            pageSizeOptions={[15,30,45,60,75,90]}
           />
         </Box>
       </Box>

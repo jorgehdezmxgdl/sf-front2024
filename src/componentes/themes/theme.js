@@ -5,11 +5,12 @@ import { createTheme  } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#4682B4', // Copper
+      main: '#865645', // Copper
       contrastText: '#fff', // White Smoke for text on primary
     },
     secondary: {
-      main: '#574E40', // Dark Charcoal
+      main: '#7c6d66',
+      contrastText: '#fff',
     },
     background: {
       default: '#EDEDED', // Off-White

@@ -218,7 +218,7 @@ export default function Empleado(props) {
   const handleSubmit = (event) => {
     const errores = {};
     const camposVacios = encontrarCamposVacios();
-    alert(camposVacios.length);
+    console.log("Campos vacíos:", camposVacios);
     if (camposVacios.length > 0) {
       camposVacios.map((campo) => {
         errores[campo] = " es obligatorio este dato";
@@ -402,7 +402,6 @@ export default function Empleado(props) {
 
   return (
     <>
-      const lectura = props.isReadOnly;
       <Dialog
         open={props.open}
         maxWidth={"md"}

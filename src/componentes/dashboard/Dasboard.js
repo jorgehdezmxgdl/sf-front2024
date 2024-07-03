@@ -20,6 +20,7 @@ import Catalogo from "../compras/Catalogo";
 import Requisicion from "../compras/Requisicion";
 import Compra from "../compras/Compra";
 import Visor from "../utilities/Visor";
+import DataGeneral from "./DataGeneral";
 
 const drawerWidth = 240;
 
@@ -28,6 +29,7 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const ComponentMap = {
+    0: DataGeneral,
     1: Empresa,
     2: MenuConfig,
     3: Proveedor,
@@ -52,6 +54,8 @@ export default function App() {
     setShow(opcion);
     setDrawerOpen(false);
   };
+
+
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>

@@ -29,6 +29,7 @@ export default function FotoEmpleado(props) {
 
   const [photo, setPhoto]       = useState("");
   const [openV, setOpenV]       = useState(false);
+  const [imageBase64, setImageBase64] = useState('');
 
   const closeV = () => {
     setOpenV(false);
@@ -55,9 +56,23 @@ export default function FotoEmpleado(props) {
   const handleFileDialog = () => {
     console.log("Seleccionar archivo");
   }
+
+  const onFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+        setImageBase64(reader.result);
+    };
+    reader.readAsDataURL(file);
+    console.log("Imagen seleccionada");
+    console.log(file);
+    console.log(imageBase64);
+};
   
   const handleButtonClick = () => {
     fileInputRef.current.click();
+  
   };
 
   const handleFileChange = (event) => {
@@ -105,6 +120,12 @@ export default function FotoEmpleado(props) {
           />
               <MenuItem onClick={handleClickOpen}>Capturar foto desde WEBCAM</MenuItem>
               <MenuItem onClick={handleButtonClick}>Seleccionar archivo</MenuItem>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={onFileChange}
+            />
             </Menu>
         </Box>
       <Dialog open={open} onClose={handleCloseDialog}>

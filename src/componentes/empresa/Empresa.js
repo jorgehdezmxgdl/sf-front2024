@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import axios from 'axios';
 import "dayjs/locale/es-mx";
 import {
   Button,
+  Tooltip,
   Grid,
   Avatar
 } from "@mui/material";
@@ -15,31 +16,36 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MiModulo from "./Modulo";
 import Empleado from "./Empleado";
+import { LocaleText } from '../utilities/LocaleText';
 
 function MyComponent(props) {
   const [open, setOpen] = React.useState(false);
   const [fetchTrigger, setFetchTrigger] = useState(0);
-  const [rows, setRows] = useState([]);  
-  const [show, setShow] = useState("none"); 
-  const [isReadOnly, setIsReadOnly] = useState(false); 
+  const [rows, setRows] = useState([]);
+  const [show, setShow] = useState("none");
+  const [isReadOnly, setIsReadOnly] = useState(false);
   const [mdata, setMdata] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:5784/empleados');
-        setRows(response.data);
+        const processedData = response.data.map((empleado) => ({
+          ...empleado,
+          avatarUrl: empleado.imagen, // Asegúrate de que `avatar` contiene la cadena Base64 completa
+        }));
+        console.log('Datos obtenidos:', processedData);
+        setRows(processedData);
       } catch (error) {
         console.error('Error al obtener los datos:', error);
       }
     };
-
     fetchData();
-  }, [fetchTrigger]); 
-  
+  }, [fetchTrigger]);
+
   const handleClickOpen = async (params) => {
-     setIsReadOnly(false);
-     setOpen(true);
+    setIsReadOnly(false);
+    setOpen(true);
   };
 
   const handleRowClickOpen = async (params) => {
@@ -57,7 +63,7 @@ function MyComponent(props) {
   }
 
 
-  const handleClose = () => {    
+  const handleClose = () => {
     setOpen(false);
   };
 
@@ -66,7 +72,17 @@ function MyComponent(props) {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", width: 40 },
+    { field: "id", headerName: "ID", width: 50 },
+    {
+      field: "imagen",
+      headerName: "Foto",
+      sortable: false,
+      width: 100,
+      editable: false,
+      renderCell: (params) => {
+        <Avatar src={params.value} alt={"imagen"} />
+      }
+    },
     {
       field: "nombre",
       headerName: "Nombre(s)",
@@ -93,8 +109,22 @@ function MyComponent(props) {
       editable: false,
     },
     {
+      field: "telef_casa",
+      headerName: "Teléfono casa",
+      //type: "date",
+      width: 190,
+      editable: false,
+    },
+    {
       field: "telef_mobile",
       headerName: "Teléfono móvil",
+      //type: "date",
+      width: 190,
+      editable: false,
+    },
+    {
+      field: "numero_ss",
+      headerName: "Número de SS",
       //type: "date",
       width: 190,
       editable: false,
@@ -114,16 +144,13 @@ function MyComponent(props) {
       headerName: "Acciones",
       sortable: false,
       filterable: false,
-      headerAlign: 'center' ,
+      headerAlign: 'center',
       cellClassName: "actions-cell",
-      width: 270,
+      width: 250,
       renderCell: (params) => {
         const onClickEdit = (e) => {
           e.stopPropagation(); // don't select this row after clicking
-
           const value = params.row.id;
-
-          console.log("Edit", value);
         };
 
         const onClickDelete = async (e) => {
@@ -133,25 +160,25 @@ function MyComponent(props) {
           console.log("Delete", params.id);
           const myId = { id: params.id };
 
-            try {
-              const response = await axios.delete('http://127.0.0.1:5784/empleados', { data: myId });
-              console.log('Código de estado:', response.status); // Muestra el código de estado de la respuesta
-        
-              if (response.status === 200) {
-                // Ejecuta acciones específicas para el código de estado 200
-                console.log('Datos enviados correctamente:', response.data);
-                setFetchTrigger(prev => prev + 1);
+          try {
+            const response = await axios.delete('http://127.0.0.1:5784/empleados', { data: myId });
+            console.log('Código de estado:', response.status); // Muestra el código de estado de la respuesta
 
-              } else {
-                // Manejo para otros códigos de estado
-                console.log('Respuesta recibida con el código de estado:', response.status);
-              }
-              
-            } catch (error) {
-              console.error('Error al obtener los datos:', error);
-              // Puedes manejar errores o mostrar mensajes de error aquí
+            if (response.status === 200) {
+              // Ejecuta acciones específicas para el código de estado 200
+              console.log('Datos enviados correctamente:', response.data);
+              setFetchTrigger(prev => prev + 1);
+
+            } else {
+              // Manejo para otros códigos de estado
+              console.log('Respuesta recibida con el código de estado:', response.status);
             }
-          
+
+          } catch (error) {
+            console.error('Error al obtener los datos:', error);
+            // Puedes manejar errores o mostrar mensajes de error aquí
+          }
+
         };
 
         return (
@@ -166,7 +193,7 @@ function MyComponent(props) {
               onClick={onClickEdit}
             >
               Editar
-            </Button>            
+            </Button>
             <Button
               variant="contained"
               endIcon={<DeleteIcon />}
@@ -184,33 +211,43 @@ function MyComponent(props) {
       },
     },
   ];
-    
+
+  function CustomToolbar() {
+    return (
+      <Tooltip title="Escribe el dato que te interesa buscar" placement="right-start">
+          <GridToolbarContainer sx={{ justifyContent: 'flex-end' }}>
+            <GridToolbarQuickFilter />
+          </GridToolbarContainer>
+      </Tooltip>
+    );
+  }
+
   return (
     <div>
-       <Grid container spacing={2}>
-       <Grid item xs={2} sm={2}>
-      <Button
-        startIcon={<GroupIcon />}
-        variant="contained"
-        color="primary"
-        onClick={() => setShow("table")}
-      >
-        Registro de empleados
-      </Button>
-      </Grid>
-      <Grid item xs={2} sm={2}>
-      <Button
-       startIcon={<ListAltIcon />}
-        variant="contained"
-        color="secondary"
-        onClick={() => setShow("image")}
-      >
-        Módulos del sistema
-      </Button>
-      </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={2} sm={2}>
+          <Button
+            startIcon={<GroupIcon />}
+            variant="contained"
+            color="primary"
+            onClick={() => setShow("table")}
+          >
+            Registro de empleados
+          </Button>
+        </Grid>
+        <Grid item xs={2} sm={2}>
+          <Button
+            startIcon={<ListAltIcon />}
+            variant="contained"
+            color="secondary"
+            onClick={() => setShow("image")}
+          >
+            Módulos del sistema
+          </Button>
+        </Grid>
       </Grid>
       {show === "table" && (
-        <Box sx={{ height: 500, width: "100%" }}>
+        <Box sx={{ height: '79vh', width: '97vw' }}>
           <Box display="flex" justifyContent="center" mb={5}>
             <Button variant="contained" onClick={handleClickOpen} endIcon={<AddCircleOutlineIcon />}>
               Adicionar empleado
@@ -226,18 +263,30 @@ function MyComponent(props) {
                 },
               },
             }}
+            components={{
+              Toolbar: CustomToolbar,
+            }}
             sx={{
-              "& .actions-cell:focus-within": {
-                outline: "none",
+              '& .MuiDataGrid-columnHeaders': {
+                fontWeight: 'bolder',
+              },
+              '& .actions-cell:focus-within': {
+                outline: 'none',
+              },
+              '& .MuiDataGrid-columnHeaderTitle': {
+                fontWeight: 'bolder',
+                fontSize: '12px'
               },
             }}
-            pageSizeOptions={[5]}
+            localeText={LocaleText}
+            pageSizeOptions={[15,30,45,60,75,90]}
+            classes={{ columnHeaders: 'font-weight: bold;' }}
             onRowClick={handleRowClickOpen}
           />
         </Box>
-      )}      
+      )}
       {show === "image" && <MiModulo />}
-      <Empleado isReadOnly={isReadOnly}  mdata={mdata}  open={open} handleClose={handleClose} />
+      <Empleado isReadOnly={isReadOnly} mdata={mdata} open={open} handleClose={handleClose} />
     </div>
   );
 }
