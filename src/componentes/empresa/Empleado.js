@@ -99,9 +99,9 @@ export default function Empleado(props) {
     setValue(newValue);
   };
 
-  const handleFoto = (foto) => {
-    setFoto(foto);
-    setFormValues({ ...formValues, imagen: foto });
+  const handleFoto = (mfoto) => {
+    setFoto(mfoto);
+    setFormValues({ ...formValues, imagen: mfoto });
   };
 
   const [entradaTiempo, setEntradaTiempo] = React.useState(
@@ -146,6 +146,7 @@ export default function Empleado(props) {
     jefe: "",
     salario: "",
     nombre_usuario: "",
+    roles: "",
     contrasena: "",
     contrasena2: "",
     tiempo_innactivo: "1",
@@ -204,6 +205,7 @@ export default function Empleado(props) {
       puesto: "",
       jefe: "",
       salario: "",
+      roles: "",
       nombre_usuario: "",
       contrasena: "",
       contrasena2: "",
@@ -1157,6 +1159,7 @@ export default function Empleado(props) {
                     type="text"
                     fullWidth
                     margin="normal"
+                    inputProps={{ style: { textTransform: "uppercase" } }}
                     InputLabelProps={{
                       shrink: true,
                     }}
@@ -1452,12 +1455,30 @@ export default function Empleado(props) {
                   <Grid item xs={12}>
                     <TextField
                       label="Rol"
+                      value={formValues.roles}
                       select
                       fullWidth
                       margin="normal"
+                      onChange={(e) => {
+                        setFormValues({
+                          ...formValues,
+                          roles: e.target.value,
+                        });
+                        if (
+                          formErrors.roles &&
+                          e.target.value.trim() !== ""
+                        ) {
+                          setFormErrors({
+                            ...formErrors,
+                            roles: "",
+                          });
+                        }
+                      }}
                       InputLabelProps={{
                         shrink: true,
                       }}
+                      error={!!formErrors.roles}
+                      helperText={formErrors.roles || ""}
                     >
                       <MenuItem label="Administrador" value="1">
                         Administrador

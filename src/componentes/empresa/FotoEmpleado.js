@@ -9,7 +9,6 @@ import {
   DialogActions,
 } from "@mui/material";
 import { Menu, MenuItem } from "@mui/material";
-import Fade from '@mui/material/Fade';
 import React, { useState } from "react";
 import Webcam from "react-webcam";
 
@@ -27,9 +26,8 @@ export default function FotoEmpleado(props) {
     props.handleFoto(imageSrc);
   }, [webcamRef, setImgSrc]);
 
-  const [photo, setPhoto]       = useState("");
   const [openV, setOpenV]       = useState(false);
-  const [imageBase64, setImageBase64] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const closeV = () => {
     setOpenV(false);
@@ -53,26 +51,12 @@ export default function FotoEmpleado(props) {
     setOpen(false);
   };
 
-  const handleFileDialog = () => {
-    console.log("Seleccionar archivo");
-  }
+  const handleSaveDialog = () => {
+    setOpen(false);
+  };
 
-  const onFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-        setImageBase64(reader.result);
-    };
-    reader.readAsDataURL(file);
-    console.log("Imagen seleccionada");
-    console.log(file);
-    console.log(imageBase64);
-};
-  
   const handleButtonClick = () => {
     fileInputRef.current.click();
-  
   };
 
   const handleFileChange = (event) => {
@@ -85,6 +69,30 @@ export default function FotoEmpleado(props) {
       reader.readAsDataURL(file);
     }
   }
+
+
+  const readFileAsDataURL = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const onFileChange = async (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    try {
+      const result = await readFileAsDataURL(file);
+      setImgSrc(result);
+      props.handleFoto(result);
+    } catch (error) {
+      console.error("Error reading file:", error);
+    }
+  };
 
   const videoConstraints = {
     width: 150,
@@ -122,6 +130,7 @@ export default function FotoEmpleado(props) {
               <MenuItem onClick={handleButtonClick}>Seleccionar archivo</MenuItem>
               <input
                 type="file"
+                accept="image/*"
                 ref={fileInputRef}
                 style={{ display: 'none' }}
                 onChange={onFileChange}
@@ -156,7 +165,7 @@ export default function FotoEmpleado(props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancelar</Button>
-          <Button onClick={handleCloseDialog}>Guardar foto</Button>
+          <Button onClick={handleSaveDialog}>Guardar foto</Button>
         </DialogActions>
       </Dialog>
     </Box>

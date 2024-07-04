@@ -14,7 +14,7 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
-import ReCAPTCHA from "react-google-recaptcha";
+import ReCAPTCHA from 'react-google-recaptcha';
 
 import * as React from "react";
 
@@ -54,6 +54,7 @@ export default function SignInSide(props) {
   const [email, setEmail] = React.useState("");
   const [merror, setMError] = React.useState("");
   const [valor, setValor] = React.useState(0);
+  const [capt, setCapt]  = React.useState('');
 
   const [pass1, setPass1] = React.useState("");
   const [pass2, setPass2] = React.useState("");
@@ -93,6 +94,10 @@ export default function SignInSide(props) {
     setMOpen(false);
   };
 
+  const onChange = (value) => {
+    setCapt(value);
+  };
+
   const handleSendEmail = async (e) => {
     e.preventDefault();
     if (email.trim() === "" || email === null) {
@@ -106,7 +111,7 @@ export default function SignInSide(props) {
         .post("http://127.0.0.1:5784/send-email", data)
         .then((response) => {
           if (response.status === 204) {
-            setMessage("Usuario/Contraseña no válidos...");
+            setMessage("El correo electrónico no está registrado, solicita a tu administrador que te registre");
             setMError("error");
             setMOpen(true);
             return;
@@ -155,6 +160,12 @@ export default function SignInSide(props) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const info = { user: data.get("clave"), password: data.get("password") };
+    if (capt.trim() === "" || capt === null) {
+      setMOpen(true);
+      setMError("error");
+      setMessage("Debes completar el captcha");
+      return;
+    }
     //const token = await recaptchaRef.current.executeAsync();
     //console.log(info, token);
 
@@ -251,7 +262,16 @@ export default function SignInSide(props) {
                     id="password"
                     autoComplete="off"
                   />
-                  
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2 }}>
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey="6Lf_zAYqAAAAAG-b_pEv1szSpqt5BIOFbTkOi05S"
+                      onChange={onChange}
+                      lg="es-419"
+                      size="normal"
+                      theme='black'
+                    />
+                  </Box>
                   <Button
                     type="submit"
                     fullWidth
