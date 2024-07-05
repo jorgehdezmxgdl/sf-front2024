@@ -23,6 +23,7 @@ export default function AltaEdiProv(props) {
   const [open, setOpen] = React.useState(true);
   const [value, setValue] = React.useState(0);
   const [telef_casa, setTelCasa] = useState("");
+  const [paises, setPaises] = useState([]);
   const [formValues, setFormValues] = useState({
     empresa: "",
     rfc: "",
@@ -106,6 +107,16 @@ export default function AltaEdiProv(props) {
       console.error("Error al buscar datos:", error);
     }
   }
+
+  React.useEffect(async () => {
+    try {
+      const response = await axios.post(`http://localhost:5784/paises`);
+      setPaises(response.data);
+    } catch (error) {
+      console.error("Error al buscar datos:", error);
+    }
+  }, []);
+
 
   const handleFindyCP = () => {};
 
@@ -339,13 +350,19 @@ export default function AltaEdiProv(props) {
                       fullWidth
                       id="pais"
                       label="País"
+                      select
                       InputLabelProps={{
                         shrink: true,
                       }}
                       variant="outlined"
                       margin="normal"
                       value={formValues.pais}
-                    />
+                    >
+                    {paises.map((pais) => (
+                      <MenuItem key={pais.id} value={pais.id}>
+                        {pais.nombre}
+                      </MenuItem>))};
+                    </TextField>  
                   </Grid>
                 </Grid>
               </Grid>

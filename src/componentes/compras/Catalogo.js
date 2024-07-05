@@ -96,6 +96,8 @@ export default function Catalogo() {
     setShow(false);
   };
 
+
+
   return (
     <div>
       <Box

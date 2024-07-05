@@ -54,7 +54,7 @@ export default function BuscaProveedor(props) {
       //sx={{ "& .MuiDialog-paper": { width: "80%", maxWidth: "none" } }}
       onClose={props.handleClickOpen2}
     >
-      <DialogTitle sx={{ bgcolor: "#1976D2", color: "white" }}>
+      <DialogTitle sx={{ bgcolor: "#865645", color: "white" }}>
         Catálogo de productos
       </DialogTitle>
       <DialogContent>

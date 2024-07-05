@@ -203,7 +203,7 @@ export default function LevantaRequisicion(props) {
         onClose={handleClose}
         fullScreen={fullScreen}
       >
-        <DialogTitle id={"id11"} sx={{ bgcolor: "#1976D2", color: "white" }}>
+        <DialogTitle id={"id11"} sx={{ bgcolor: "#865645", color: "white" }}>
           Alta de nuevo producto
         </DialogTitle>
         <DialogContent>

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 
 import PropTypes from "prop-types";
+import debounce from 'lodash/debounce';
 
 import axios from "axios";
 
@@ -29,21 +30,61 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function AltaCatalogo(props) {
-  const [open, setOpen] = React.useState(true);
-  const [value, setValue] = React.useState(0);
-  const [images, setImages] = React.useState([]);
-  const [paises, setPaises] = React.useState([]);
-  const [disenador, setDisenador] = React.useState([]);
-  const [ml, setMl] = React.useState([]);
-  const [producto, setProducto] = React.useState({
-    largo: 0,
-    ancho: 0,
-    alto: 0,
-    volumen: 0,
-    pais: "75",
-  });
+  const [open, setOpen]             = React.useState(true);
+  const [value, setValue]           = React.useState(0);
+  const [images, setImages]         = React.useState([]);
+  const [paises, setPaises]         = React.useState([]);
+  const [disenador, setDisenador]   = React.useState([]);
+  const [ml, setMl]                 = React.useState([]);
+  const [genero, setGenero]         = React.useState([]);
+  const [almacen, setAlmacen]       = React.useState([]);
+  const [ubicacion, setUbicacion]   = React.useState([]);
+  const [tipo, setTipo]             = React.useState([]);
+  const [presenta, setPresenta]     = React.useState([]);
+  const [formErrors, setFormErrors] = React.useState({});
 
-  const labels = ["Portada", "Caja", "Perfume", "Ambos"];
+
+  const [producto, setProducto]     = React.useState({
+    sku: 1,
+    nombre: "",
+    disenador: "",
+    barcode: "",
+    alto: "",
+    ancho: "",
+    largo: "",
+    volumen: "",
+    peso: "",
+    genero: 0,
+    tipo : 0,
+    presentacion: 0,
+    ml: 0,
+    pais: 75,
+    almacen: 0,
+    ubicacion: "",
+    minimo: 0,
+    maximo: 0,
+    notascorazon: "",
+    notasfondo: "",
+    notassalida: ""
+  });
+  
+  const refs = {
+    nombre: useRef(null),
+    disenador: useRef(null),
+    barcode: useRef(null),
+    alto: useRef(null),
+    ancho: useRef(null),
+    largo: useRef(null),
+    volumen: useRef(null),
+    peso: useRef(null),
+    minimo: useRef(null),
+    maximo: useRef(null),
+    notascorazon: useRef(null),
+    notasfondo: useRef(null),
+    notassalida: useRef(null)
+  };
+
+  const labels = ["Imagen 1", "Imagen 2", "Imagen 3", "Imagen 4"];
 
   CustomTabPanel.propTypes = {
     children: PropTypes.node,
@@ -102,8 +143,41 @@ export default function AltaCatalogo(props) {
       } catch (error) {
         console.error("Error al buscar datos:", error);
       }
-
-
+      try {
+        const response = await axios.get(`http://localhost:5784/v1/consultagral/disenadorperfume`);
+        const data = response.data;
+        setGenero(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+      try {
+        const response = await axios.get(`http://localhost:5784/v1/consultagral/almacen`);
+        const data = response.data;
+        setAlmacen(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+      try {
+        const response = await axios.get(`http://localhost:5784/v1/consultagral/ubicacion`);
+        const data = response.data;
+        setUbicacion(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+      try {
+        const response = await axios.get(`http://localhost:5784/v1/consultagral/tipo`);
+        const data = response.data;
+        setTipo(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+      try {
+        const response = await axios.get(`http://localhost:5784/v1/consultagral/presentacion`);
+        const data = response.data;
+        setPresenta(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
     };
     fetchData();
   }, []);
@@ -155,19 +229,75 @@ export default function AltaCatalogo(props) {
     }
   };
 
+  const [focusField, setFocusField] = useState(null);
+
+  useEffect(() => {
+    if (refs.descripcion.current) {
+      refs.descripcion.current.focus();
+    }
+  }, [producto.descripcion]);
+
+  const handleCompChange = (field) => (e) => {
+    const newValue = e.target.value.toUpperCase();
+    setProducto((prev) => ({
+      ...prev,
+      [field]: newValue,
+    }));
+  };
+
+  const handleBlur = () => {
+    handleCalculaVolumen();
+    setFocusField('volumen');
+  };
+
+  function encontrarCamposVacios() {
+    const campos = Object.keys(producto);
+    const camposVacios = campos.filter(
+      (campo) => producto[campo] === "" || producto[campo] === null || producto[campo] === 0
+    );
+    return camposVacios;
+  }
+
+  const handleSubmit = (event) => {
+    const errores = {};
+    const camposVacios = encontrarCamposVacios();
+    console.log("Campos vacíos:", camposVacios);
+    if (camposVacios.length > 0) {
+      camposVacios.map((campo) => {
+        errores[campo] = " es obligatorio este dato";
+        return null;
+      });
+    } else {
+       console.log("Información a enviar:", producto);
+       axios.post("http://localhost:5784/v1/compras/catalogo", producto)
+         .then((response) => {
+           console.log("Respuesta del servidor:", response);
+           alert("Producto registrado correctamente");
+           handleClose();
+         })
+         .catch((error) => {
+           console.error("Error al registrar producto:", error);
+           alert("Error al registrar producto: " + error);
+         });
+    }
+  };
+
   const handleCalculaVolumen = () => {
     try {
       const volumen =
         parseFloat(producto.largo) *
         parseFloat(producto.ancho) *
         parseFloat(producto.alto);
-      setProducto({ ...producto, volumen: volumen.toFixed(2) });
+      const peso = volumen * 0.85;
+      setProducto({ ...producto, 
+         volumen: volumen.toFixed(2),
+          peso: peso.toFixed(2) 
+      });
     } catch (error) {
       console.error("Error al buscar datos:", error);
       alert("Error al buscar datos: " + error);
     }
   };
-
   
 
   return (
@@ -201,10 +331,14 @@ export default function AltaCatalogo(props) {
                       label="Producto"
                       autoComplete="off"
                       type="text"
+                      value={producto.nombre}
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
+                      onChange={handleCompChange('nombre')}
+                      inputRef={refs.nombre}
+                      inputProps={{ style: { textTransform: "uppercase" } }}
                     />
                   </Grid>
                 </Grid>
@@ -217,8 +351,12 @@ export default function AltaCatalogo(props) {
                       label="Diseñador"
                       type="text"
                       fullWidth
+                      value={producto.disenador}
                       InputLabelProps={{
                         shrink: true,
+                      }}
+                      onChange={(e) => {
+                        setProducto({ ...producto, disenador: e.target.value });
                       }}
                     >
                       {disenador.map((item, index) => (
@@ -236,10 +374,13 @@ export default function AltaCatalogo(props) {
                       id="barcode"
                       label="Barcode"
                       type="text"
+                      value={producto.barcode}
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
+                      onChange={handleCompChange('barcode')}
+                      inputRef={refs.barcode}
                     />
                   </Grid>
                 </Grid>
@@ -248,8 +389,8 @@ export default function AltaCatalogo(props) {
                     <Grid item xs={12} sm={4}>
                       <TextField
                         label="Alto"
-                        value={producto.alto}
                         fullWidth
+                        value={producto.alto}
                         type="text"
                         margin="normal"
                         InputProps={{
@@ -257,9 +398,8 @@ export default function AltaCatalogo(props) {
                             <InputAdornment position="start">cm</InputAdornment>
                           ),
                         }}
-                        onChange={(e) => {
-                          setProducto({ ...producto, alto: e.target.value });
-                        }}
+                        onChange={handleCompChange('alto')}
+                        inputRef={refs.alto}
                         InputLabelProps={{
                           shrink: true,
                         }}
@@ -280,9 +420,8 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={(e) => {
-                          setProducto({ ...producto, largo: e.target.value });
-                        }}
+                        onChange={handleCompChange('largo')}
+                        inputRef={refs.largo}
                       />
                     </Grid>
                     <Grid item xs={6} sm={4}>
@@ -300,10 +439,9 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={(e) => {
-                          setProducto({ ...producto, ancho: e.target.value });
-                        }}
-                        onBlur={handleCalculaVolumen}
+                        onChange={handleCompChange('ancho')}
+                        inputRef={refs.ancho}
+                        onBlur={handleBlur}
                       />
                     </Grid>
                   </Grid>
@@ -333,6 +471,7 @@ export default function AltaCatalogo(props) {
                         label="Peso"
                         fullWidth
                         margin="normal"
+                        value={producto.peso}
                         InputLabelProps={{
                           shrink: true,
                         }}
@@ -341,6 +480,8 @@ export default function AltaCatalogo(props) {
                             <InputAdornment position="start">gr</InputAdornment>
                           ),
                         }}
+                        onChange={handleCompChange('peso')}
+                        inputRef={refs.peso}
                       />
                     </Grid>
                   </Grid>
@@ -351,21 +492,43 @@ export default function AltaCatalogo(props) {
                       <TextField
                         label="Género"
                         fullWidth
+                        select
+                        value={producto.genero}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                      />
+                        onChange={(e) => {
+                          setProducto({ ...producto, genero: e.target.value });
+                        }}
+                      >
+                        {genero.map((item, index) => (
+                          <MenuItem key={index} value={item.id}>
+                            {item.nombre}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         label="Tipo"
                         fullWidth
+                        select
+                        value={producto.tipo}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                      />
+                        onChange={(e) => {
+                          setProducto({ ...producto, tipo: e.target.value });
+                        }}
+                      >
+                        {tipo.map((item, index) => (
+                          <MenuItem key={index} value={item.id}>
+                            {item.nombre}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -375,20 +538,35 @@ export default function AltaCatalogo(props) {
                       <TextField
                         label="Presentación"
                         fullWidth
+                        select
+                        value={producto.presentacion}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                      />
+                        onChange={(e) => {
+                          setProducto({ ...producto, presentacion: e.target.value });
+                        }}
+                        >
+                        {presenta.map((item, index) => (
+                          <MenuItem key={index} value={item.id}>
+                            {item.nombre}
+                          </MenuItem>
+                        ))}
+                      </TextField>
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         label="ML"
                         fullWidth
+                        value={producto.ml}
                         select
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
+                        }}
+                        onChange={(e) => {
+                          setProducto({ ...producto, ml: e.target.value });
                         }}
                       >
                        {ml.map((item, index) => (
@@ -412,6 +590,9 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
+                        onChange={(e) => {
+                          setProducto({ ...producto, pais: e.target.value });
+                        }}
                       >
                         {paises.map((item, index) => (
                           <MenuItem key={index} value={item.id}>
@@ -430,12 +611,22 @@ export default function AltaCatalogo(props) {
                       margin="normal"
                       id="almacen"
                       label="Almacen"
-                      type="text"
+                      value={producto.almacen}
+                      select
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
-                    />
+                      onChange={(e) => {
+                        setProducto({ ...producto, almacen: e.target.value });
+                      }}
+                    >
+                      {almacen.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>
+                          {item.nombre}
+                        </MenuItem>
+                      ))}
+                    </TextField>
                   </Grid>
                 </Grid>
                 <Grid container spacing={2}>
@@ -443,13 +634,23 @@ export default function AltaCatalogo(props) {
                     <TextField
                       margin="normal"
                       id="ubicacion"
+                      value={producto.ubicacion}
                       label="Ubicación"
-                      type="text"
                       fullWidth
+                      select
                       InputLabelProps={{
                         shrink: true,
                       }}
-                    />
+                      onChange={(e) => {
+                        setProducto({ ...producto, ubicacion: e.target.value });
+                      }}
+                    >
+                      {ubicacion.map((item, index) => (
+                        <MenuItem key={index} value={item.id}>
+                          {item.nombre}
+                        </MenuItem>
+                      ))}
+                    </TextField>
                   </Grid>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -458,6 +659,7 @@ export default function AltaCatalogo(props) {
                       <TextField
                         label="Mínimo de productos"
                         fullWidth
+                        value={producto.minimo}
                         margin="normal"
                         InputProps={{
                           inputMode: "numeric",
@@ -471,12 +673,15 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
+                        onChange={handleCompChange('minimo')}
+                        inputRef={refs.minimo}
                       />
                     </Grid>
                     <Grid item xs={6} sm={6}>
                       <TextField
                         label="Máximo de productos"
                         fullWidth
+                        value={producto.maximo}
                         margin="normal"
                         InputProps={{
                           inputMode: "numeric",
@@ -490,6 +695,8 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
+                        onChange={handleCompChange('maximo')}
+                        inputRef={refs.maximo}
                       />
                     </Grid>
                   </Grid>
@@ -500,11 +707,14 @@ export default function AltaCatalogo(props) {
                       margin="normal"
                       id="corazon"
                       label="Notas de corazón"
+                      value={producto.notascorazon}
                       type="text"
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
+                      onChange={handleCompChange('notascorazon')}
+                      inputRef={refs.notascorazon}
                     />
                   </Grid>
                 </Grid>
@@ -514,11 +724,14 @@ export default function AltaCatalogo(props) {
                       margin="normal"
                       id="fondo"
                       label="Notas de fondo"
+                      value={producto.notasfondo}
                       type="text"
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
+                      onChange={handleCompChange('notasfondo')}
+                      inputRef={refs.notasfondo}
                     />
                   </Grid>
                 </Grid>
@@ -528,11 +741,14 @@ export default function AltaCatalogo(props) {
                       margin="normal"
                       id="salida"
                       label="Notas de salida"
+                      value={producto.notassalida}
                       type="text"
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
+                      onChange={handleCompChange('notassalida')}
+                      inputRef={refs.notassalida}
                     />
                   </Grid>
                 </Grid>
@@ -604,8 +820,11 @@ export default function AltaCatalogo(props) {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
+        <Button onClick={handleClose} color="secondary">
           Cerrar
+        </Button>
+        <Button onClick={handleSubmit} color="primary">
+          Registrar
         </Button>
       </DialogActions>
     </Dialog>

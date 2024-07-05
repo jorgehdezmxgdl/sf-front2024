@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MiModulo from "./Modulo";
 import Empleado from "./Empleado";
 import { LocaleText } from '../utilities/LocaleText';
+import ConfirmacionDlg from "../utilities/ConfirmacionDlg";
 
 function MyComponent(props) {
   const [open, setOpen] = React.useState(false);
@@ -25,6 +26,7 @@ function MyComponent(props) {
   const [show, setShow] = useState("none");
   const [isReadOnly, setIsReadOnly] = useState(false);
   const [mdata, setMdata] = useState({});
+  const [confirma, setConfirma] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,8 +63,7 @@ function MyComponent(props) {
       console.error('Error al obtener los datos:', error);
     }
   }
-
-
+  
   const handleClose = () => {
     setOpen(false);
   };
@@ -149,18 +150,16 @@ function MyComponent(props) {
       width: 250,
       renderCell: (params) => {
         const onClickEdit = (e) => {
-          e.stopPropagation(); // don't select this row after clicking
+          e.stopPropagation(); 
           const value = params.row.id;
         };
 
         const onClickDelete = async (e) => {
-          e.stopPropagation(); // don't select this row after clicking
-
-          // call your method to handle the delete action
-          console.log("Delete", params.id);
+          e.stopPropagation(); 
           const myId = { id: params.id };
 
-          try {
+          //try {
+            /*
             const response = await axios.delete('http://127.0.0.1:5784/empleados', { data: myId });
             console.log('Código de estado:', response.status); // Muestra el código de estado de la respuesta
 
@@ -178,6 +177,7 @@ function MyComponent(props) {
             console.error('Error al obtener los datos:', error);
             // Puedes manejar errores o mostrar mensajes de error aquí
           }
+            */
 
         };
 
@@ -205,7 +205,7 @@ function MyComponent(props) {
             >
               Eliminar
             </Button>
-
+          
           </>
         );
       },
