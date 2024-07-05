@@ -23,7 +23,7 @@ import BusinessIcon from '@mui/icons-material/Business';
 import FaceIcon from '@mui/icons-material/Face';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import DoorFrontIcon from '@mui/icons-material/DoorFront';
-
+const  printer = require("./checkprinter")
 
 export default function Nested(props) {
   const [show, setShow]     = React.useState(0);
@@ -36,31 +36,66 @@ export default function Nested(props) {
   };
 
   const handleClickRH = () => {
-    setOpenRH(!openRH);
+    try {
+      setOpenRH(!openRH);
+    } catch (error) {
+      console.log(error);
+    }
+    
   };
 
   const handleHR_Personal = () => {
-     props.handleShow(1);
+    try {
+      printer.chkprt();
+      props.handleShow(1);
+    } catch (error) {
+      console.log(error);
+    };
   };
 
   const handleCompra_Proveedor = () => {
+    try {
+      printer.chkprt();
       props.handleShow(3);
+    } catch (error) {
+      console.log(error);
+    };
   };
 
   const handleCompra_Catalogo = () => {
+    try {
+      printer.chkprt();
       props.handleShow(4);
+    } catch (error) {
+      console.log(error);
+    };
   };
 
   const handleCompra_Requesiciones = () => {
+    try {
+      printer.chkprt();
       props.handleShow(5);
+    } catch (error) {
+      console.log(error);
+    };
   };
 
   const handleCompra_Orden = () => {
+    try {
+      printer.chkprt();
       props.handleShow(6);
+    } catch (error) {
+      console.log(error);
+    };
   };
 
   const handleImprimir = () => {
+    try {
+      printer.chkprt();
       props.handleShow(7);
+    } catch (error) {
+      console.log(error);
+    };
   };
   
   return (
