@@ -33,69 +33,43 @@ export default function Nested(props) {
 
   const handleClickCompras = () => {
     setOpenCC(!openCC);
+    printer.chkprt();
   };
 
   const handleClickRH = () => {
-    try {
-      setOpenRH(!openRH);
-    } catch (error) {
-      console.log(error);
-    }
-    
+      setOpenRH(!openRH); 
   };
 
   const handleHR_Personal = () => {
-    try {
       printer.chkprt();
       props.handleShow(1);
-    } catch (error) {
-      console.log(error);
-    };
   };
 
   const handleCompra_Proveedor = () => {
-    try {
       printer.chkprt();
       props.handleShow(3);
-    } catch (error) {
-      console.log(error);
-    };
   };
 
   const handleCompra_Catalogo = () => {
-    try {
       printer.chkprt();
       props.handleShow(4);
-    } catch (error) {
-      console.log(error);
-    };
   };
 
   const handleCompra_Requesiciones = () => {
-    try {
       printer.chkprt();
       props.handleShow(5);
-    } catch (error) {
-      console.log(error);
-    };
   };
 
   const handleCompra_Orden = () => {
-    try {
       printer.chkprt();
       props.handleShow(6);
-    } catch (error) {
-      console.log(error);
-    };
+   
   };
 
   const handleImprimir = () => {
-    try {
       printer.chkprt();
       props.handleShow(7);
-    } catch (error) {
-      console.log(error);
-    };
+  
   };
   
   return (
