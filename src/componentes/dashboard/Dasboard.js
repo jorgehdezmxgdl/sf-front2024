@@ -7,7 +7,7 @@ import {
   Drawer,
   IconButton,
 } from "@mui/material";
-import milogo from "../login//milogo.png";
+import milogo from "../login/milogo.png";
 import Empresa from "../empresa/Empresa";
 import MenuConfig from "../configuracion/MenuConf";
 import MenuIcon from "@mui/icons-material/Menu";

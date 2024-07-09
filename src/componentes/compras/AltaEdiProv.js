@@ -108,15 +108,17 @@ export default function AltaEdiProv(props) {
     }
   }
 
-  React.useEffect(async () => {
-    try {
-      const response = await axios.post(`http://localhost:5784/paises`);
-      setPaises(response.data);
-    } catch (error) {
-      console.error("Error al buscar datos:", error);
-    }
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post(`http://localhost:5784/paises`);
+        setPaises(response.data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+    };
+    fetchData();
   }, []);
-
 
   const handleFindyCP = () => {};
 

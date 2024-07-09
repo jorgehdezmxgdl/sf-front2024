@@ -23,7 +23,7 @@ import BusinessIcon from '@mui/icons-material/Business';
 import FaceIcon from '@mui/icons-material/Face';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import DoorFrontIcon from '@mui/icons-material/DoorFront';
-const  printer = require("./checkprinter")
+
 
 export default function Nested(props) {
   const [show, setShow]     = React.useState(0);
@@ -33,7 +33,6 @@ export default function Nested(props) {
 
   const handleClickCompras = () => {
     setOpenCC(!openCC);
-    printer.chkprt();
   };
 
   const handleClickRH = () => {
@@ -41,35 +40,28 @@ export default function Nested(props) {
   };
 
   const handleHR_Personal = () => {
-      printer.chkprt();
       props.handleShow(1);
   };
 
   const handleCompra_Proveedor = () => {
-      printer.chkprt();
       props.handleShow(3);
   };
 
   const handleCompra_Catalogo = () => {
-      printer.chkprt();
       props.handleShow(4);
   };
 
   const handleCompra_Requesiciones = () => {
-      printer.chkprt();
       props.handleShow(5);
   };
 
   const handleCompra_Orden = () => {
-      printer.chkprt();
-      props.handleShow(6);
+    props.handleShow(6);
    
   };
 
   const handleImprimir = () => {
-      printer.chkprt();
       props.handleShow(7);
-  
   };
   
   return (

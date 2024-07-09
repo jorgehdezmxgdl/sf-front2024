@@ -742,7 +742,7 @@ export default function Empleado(props) {
                           <MenuItem value="AB-">AB-</MenuItem>
                           <MenuItem value="O+">O+</MenuItem>
                           <MenuItem value="O-">O-</MenuItem>
-                          <MenuItem value="D">No lo sé</MenuItem>
+                          <MenuItem value="?">No lo sé</MenuItem>
                         </TextField>
                       </Grid>
                       <Grid item xs={6} sm={4}>

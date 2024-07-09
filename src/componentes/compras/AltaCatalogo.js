@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -28,6 +28,7 @@ import axios from "axios";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+
 
 export default function AltaCatalogo(props) {
   const [open, setOpen]             = React.useState(true);
@@ -68,21 +69,7 @@ export default function AltaCatalogo(props) {
     notassalida: ""
   });
   
-  const refs = {
-    nombre: useRef(null),
-    disenador: useRef(null),
-    barcode: useRef(null),
-    alto: useRef(null),
-    ancho: useRef(null),
-    largo: useRef(null),
-    volumen: useRef(null),
-    peso: useRef(null),
-    minimo: useRef(null),
-    maximo: useRef(null),
-    notascorazon: useRef(null),
-    notasfondo: useRef(null),
-    notassalida: useRef(null)
-  };
+  const inputRefs = useRef({});
 
   const labels = ["Imagen 1", "Imagen 2", "Imagen 3", "Imagen 4"];
 
@@ -229,25 +216,8 @@ export default function AltaCatalogo(props) {
     }
   };
 
-  const [focusField, setFocusField] = useState(null);
-
-  useEffect(() => {
-    if (refs.descripcion.current) {
-      refs.descripcion.current.focus();
-    }
-  }, [producto.descripcion]);
-
-  const handleCompChange = (field) => (e) => {
-    const newValue = e.target.value.toUpperCase();
-    setProducto((prev) => ({
-      ...prev,
-      [field]: newValue,
-    }));
-  };
-
   const handleBlur = () => {
     handleCalculaVolumen();
-    setFocusField('volumen');
   };
 
   function encontrarCamposVacios() {
@@ -299,6 +269,45 @@ export default function AltaCatalogo(props) {
     }
   };
   
+  const handleCompChange = React.useCallback((name) => (event) => {
+    const value = event.target.value;
+    setProducto(prevProducto => {
+      if (prevProducto[name] === value) return prevProducto;
+      
+      return {
+        ...prevProducto,
+        [name]: value
+      };
+    });
+    setTimeout(() => {
+      if (inputRefs.current[name]) {
+        inputRefs.current[name].focus();
+      }
+    }, 0);
+  }, []);
+
+
+  const textFields = useMemo(() => [
+    { name: 'nombre', label: 'Nombre del Producto', type: 'text' },
+    { name: 'disenador', label: 'Diseñador', type: 'int' },
+    { name: 'barcode', label: 'Código Barras' },
+    { name: 'alto', label: 'Alto', type: 'int' },
+    { name: 'largo', label: 'Largo' },
+    { name: 'ancho', label: 'Ancho' },
+    { name: 'peso',  label: 'Peso' },
+    { name: 'genero',  label: 'Género' },
+    { name: 'tipo',  label: 'Tipo' },
+    { name: 'presentacion',  label: 'Presentación' },
+    { name: 'ml',  label: 'ML' },
+    { name: 'pais',  label: 'País de Origen' },
+    { name: 'almacen',  label: 'Almacen' },
+    { name: 'ubicacion',  label: 'Ubicación' },
+    { name: 'minimo',  label: 'Mínimo' },
+    { name: 'maximo',  label: 'Máximo' },
+    { name: 'notascorazon',  label: 'Notas corazón' },
+    { name: 'notasfondo',  label: 'Notas fondo' },
+    { name: 'notassalida',  label: 'Nota Salida' },
+  ], []);
 
   return (
     <Dialog
@@ -327,17 +336,18 @@ export default function AltaCatalogo(props) {
                   <Grid item xs={12} sm={12}>
                     <TextField
                       margin="normal"
-                      id="producto"
-                      label="Producto"
                       autoComplete="off"
                       type="text"
-                      value={producto.nombre}
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      onChange={handleCompChange('nombre')}
-                      inputRef={refs.nombre}
+                      key={textFields[0].name}
+                      name={textFields[0].name}
+                      label={textFields[0].label}
+                      value={producto[textFields[0].name]}
+                      onChange={handleCompChange(textFields[0].name)}
+                      inputRef={el => inputRefs.current['nombre'] = el}                      
                       inputProps={{ style: { textTransform: "uppercase" } }}
                     />
                   </Grid>
@@ -348,16 +358,17 @@ export default function AltaCatalogo(props) {
                       margin="normal"
                       select
                       id="disenador"
-                      label="Diseñador"
                       type="text"
                       fullWidth
-                      value={producto.disenador}
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      onChange={(e) => {
-                        setProducto({ ...producto, disenador: e.target.value });
-                      }}
+                      key={textFields[1].name}
+                      name={textFields[1].name}
+                      label={textFields[1].label}
+                      value={producto[textFields[1].name]}
+                      onChange={handleCompChange(textFields[1].name)}
+                      inputRef={el => inputRefs.current['disenador'] = el}
                     >
                       {disenador.map((item, index) => (
                         <MenuItem key={index} value={item.id}>
@@ -372,15 +383,17 @@ export default function AltaCatalogo(props) {
                     <TextField
                       margin="normal"
                       id="barcode"
-                      label="Barcode"
                       type="text"
-                      value={producto.barcode}
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      onChange={handleCompChange('barcode')}
-                      inputRef={refs.barcode}
+                      key={textFields[2].name}
+                      name={textFields[2].name}
+                      label={textFields[2].label}
+                      value={producto[textFields[2].name]}
+                      onChange={handleCompChange(textFields[2].name)}
+                      inputRef={el => inputRefs.current['barcode'] = el}
                     />
                   </Grid>
                 </Grid>
@@ -388,9 +401,7 @@ export default function AltaCatalogo(props) {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
                       <TextField
-                        label="Alto"
                         fullWidth
-                        value={producto.alto}
                         type="text"
                         margin="normal"
                         InputProps={{
@@ -398,8 +409,12 @@ export default function AltaCatalogo(props) {
                             <InputAdornment position="start">cm</InputAdornment>
                           ),
                         }}
-                        onChange={handleCompChange('alto')}
-                        inputRef={refs.alto}
+                        key={textFields[3].name}
+                        name={textFields[3].name}
+                        label={textFields[3].label}
+                        value={producto[textFields[3].name]}
+                        onChange={handleCompChange(textFields[3].name)}
+                        inputRef={el => inputRefs.current['alto'] = el}
                         InputLabelProps={{
                           shrink: true,
                         }}
@@ -407,8 +422,6 @@ export default function AltaCatalogo(props) {
                     </Grid>
                     <Grid item xs={6} sm={4}>
                       <TextField
-                        label="Largo"
-                        value={producto.largo}
                         fullWidth
                         type="text"
                         margin="normal"
@@ -420,14 +433,17 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={handleCompChange('largo')}
-                        inputRef={refs.largo}
+                        key={textFields[4].name}
+                        name={textFields[4].name}
+                        label={textFields[4].label}
+                        value={producto[textFields[4].name]}
+                        onChange={handleCompChange(textFields[4].name)}
+                        inputRef={el => inputRefs.current['largo'] = el} 
+                        
                       />
                     </Grid>
                     <Grid item xs={6} sm={4}>
                       <TextField
-                        label="Ancho"
-                        value={producto.ancho}
                         type="text"
                         fullWidth
                         margin="normal"
@@ -439,8 +455,12 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={handleCompChange('ancho')}
-                        inputRef={refs.ancho}
+                        key={textFields[5].name}
+                        name={textFields[5].name}
+                        label={textFields[5].label}
+                        value={producto[textFields[5].name]}
+                        onChange={handleCompChange(textFields[5].name)}
+                        inputRef={el => inputRefs.current['ancho'] = el}                        
                         onBlur={handleBlur}
                       />
                     </Grid>
@@ -450,8 +470,6 @@ export default function AltaCatalogo(props) {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Volumen"
-                        value={producto.volumen}
                         fullWidth
                         type="text"
                         margin="normal"
@@ -464,14 +482,17 @@ export default function AltaCatalogo(props) {
                           ),
                           readOnly: true,
                         }}
+                        key={"volumen"}
+                        name="volumen"
+                        label="Volumen"
+                        value={producto.volumen}
+                        inputRef={el => inputRefs.current['volumen'] = el}       
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Peso"
                         fullWidth
                         margin="normal"
-                        value={producto.peso}
                         InputLabelProps={{
                           shrink: true,
                         }}
@@ -480,8 +501,12 @@ export default function AltaCatalogo(props) {
                             <InputAdornment position="start">gr</InputAdornment>
                           ),
                         }}
-                        onChange={handleCompChange('peso')}
-                        inputRef={refs.peso}
+                        key={textFields[6].name}
+                        name={textFields[6].name}
+                        label={textFields[6].label}
+                        value={producto[textFields[6].name]}
+                        onChange={handleCompChange(textFields[6].name)}
+                        inputRef={el => inputRefs.current['peso'] = el}       
                       />
                     </Grid>
                   </Grid>
@@ -490,17 +515,18 @@ export default function AltaCatalogo(props) {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Género"
                         fullWidth
                         select
-                        value={producto.genero}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={(e) => {
-                          setProducto({ ...producto, genero: e.target.value });
-                        }}
+                        key={textFields[7].name}
+                        name={textFields[7].name}
+                        label={textFields[7].label}
+                        value={producto[textFields[7].name]}
+                        onChange={handleCompChange(textFields[7].name)}
+                        inputRef={el => inputRefs.current['genero'] = el}     
                       >
                         {genero.map((item, index) => (
                           <MenuItem key={index} value={item.id}>
@@ -511,17 +537,18 @@ export default function AltaCatalogo(props) {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Tipo"
                         fullWidth
                         select
-                        value={producto.tipo}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={(e) => {
-                          setProducto({ ...producto, tipo: e.target.value });
-                        }}
+                        key={textFields[8].name}
+                        name={textFields[8].name}
+                        label={textFields[8].label}
+                        value={producto[textFields[8].name]}
+                        onChange={handleCompChange(textFields[8].name)}
+                        inputRef={el => inputRefs.current['tipo'] = el}     
                       >
                         {tipo.map((item, index) => (
                           <MenuItem key={index} value={item.id}>
@@ -536,17 +563,18 @@ export default function AltaCatalogo(props) {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Presentación"
                         fullWidth
                         select
-                        value={producto.presentacion}
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={(e) => {
-                          setProducto({ ...producto, presentacion: e.target.value });
-                        }}
+                        key={textFields[9].name}
+                        name={textFields[9].name}
+                        label={textFields[9].label}
+                        value={producto[textFields[9].name]}
+                        onChange={handleCompChange(textFields[9].name)}
+                        inputRef={el => inputRefs.current['presentacion'] = el}     
                         >
                         {presenta.map((item, index) => (
                           <MenuItem key={index} value={item.id}>
@@ -557,17 +585,18 @@ export default function AltaCatalogo(props) {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="ML"
                         fullWidth
-                        value={producto.ml}
                         select
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={(e) => {
-                          setProducto({ ...producto, ml: e.target.value });
-                        }}
+                        key={textFields[10].name}
+                        name={textFields[10].name}
+                        label={textFields[10].label}
+                        value={producto[textFields[10].name]}
+                        onChange={handleCompChange(textFields[10].name)}
+                        inputRef={el => inputRefs.current['ml'] = el}    
                       >
                        {ml.map((item, index) => (
                          <MenuItem key={index} value={item.id}>
@@ -582,17 +611,18 @@ export default function AltaCatalogo(props) {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={12}>
                       <TextField
-                        label="País de origen"
-                        value={producto.pais}
                         fullWidth
                         select
                         margin="normal"
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={(e) => {
-                          setProducto({ ...producto, pais: e.target.value });
-                        }}
+                        key={textFields[11].name}
+                        name={textFields[11].name}
+                        label={textFields[11].label}
+                        value={producto[textFields[11].name]}
+                        onChange={handleCompChange(textFields[11].name)}
+                        inputRef={el => inputRefs.current['pais'] = el}    
                       >
                         {paises.map((item, index) => (
                           <MenuItem key={index} value={item.id}>
@@ -609,17 +639,17 @@ export default function AltaCatalogo(props) {
                   <Grid item xs={12} sm={12}>
                     <TextField
                       margin="normal"
-                      id="almacen"
-                      label="Almacen"
-                      value={producto.almacen}
                       select
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      onChange={(e) => {
-                        setProducto({ ...producto, almacen: e.target.value });
-                      }}
+                      key={textFields[12].name}
+                        name={textFields[12].name}
+                        label={textFields[12].label}
+                        value={producto[textFields[12].name]}
+                        onChange={handleCompChange(textFields[12].name)}
+                        inputRef={el => inputRefs.current['almacen'] = el}    
                     >
                       {almacen.map((item, index) => (
                         <MenuItem key={index} value={item.id}>
@@ -633,17 +663,17 @@ export default function AltaCatalogo(props) {
                   <Grid item xs={12} sm={12}>
                     <TextField
                       margin="normal"
-                      id="ubicacion"
-                      value={producto.ubicacion}
-                      label="Ubicación"
                       fullWidth
                       select
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      onChange={(e) => {
-                        setProducto({ ...producto, ubicacion: e.target.value });
-                      }}
+                      key={textFields[13].name}
+                      name={textFields[13].name}
+                      label={textFields[13].label}
+                      value={producto[textFields[13].name]}
+                      onChange={handleCompChange(textFields[13].name)}
+                      inputRef={el => inputRefs.current['ubicacion'] = el}    
                     >
                       {ubicacion.map((item, index) => (
                         <MenuItem key={index} value={item.id}>
@@ -657,9 +687,7 @@ export default function AltaCatalogo(props) {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        label="Mínimo de productos"
                         fullWidth
-                        value={producto.minimo}
                         margin="normal"
                         InputProps={{
                           inputMode: "numeric",
@@ -673,15 +701,17 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={handleCompChange('minimo')}
-                        inputRef={refs.minimo}
+                        key={textFields[14].name}
+                        name={textFields[14].name}
+                        label={textFields[14].label}
+                        value={producto[textFields[14].name]}
+                        onChange={handleCompChange(textFields[14].name)}
+                        inputRef={el => inputRefs.current['minimo'] = el}   
                       />
                     </Grid>
                     <Grid item xs={6} sm={6}>
                       <TextField
-                        label="Máximo de productos"
-                        fullWidth
-                        value={producto.maximo}
+                       fullWidth
                         margin="normal"
                         InputProps={{
                           inputMode: "numeric",
@@ -695,8 +725,13 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
-                        onChange={handleCompChange('maximo')}
-                        inputRef={refs.maximo}
+                        key={textFields[15].name}
+                      name={textFields[15].name}
+                      label={textFields[15].label}
+                      value={producto[textFields[15].name]}
+                      onChange={handleCompChange(textFields[15].name)}
+                      inputRef={el => inputRefs.current['maximo'] = el}   
+                       
                       />
                     </Grid>
                   </Grid>
@@ -705,16 +740,17 @@ export default function AltaCatalogo(props) {
                   <Grid item xs={12} sm={12}>
                     <TextField
                       margin="normal"
-                      id="corazon"
-                      label="Notas de corazón"
-                      value={producto.notascorazon}
                       type="text"
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      onChange={handleCompChange('notascorazon')}
-                      inputRef={refs.notascorazon}
+                      key={textFields[16].name}
+                      name={textFields[16].name}
+                      label={textFields[16].label}
+                      value={producto[textFields[16].name]}
+                      onChange={handleCompChange(textFields[16].name)}
+                      inputRef={el => inputRefs.current['notascorazon'] = el}  
                     />
                   </Grid>
                 </Grid>
@@ -722,16 +758,17 @@ export default function AltaCatalogo(props) {
                   <Grid item xs={12} sm={12}>
                     <TextField
                       margin="normal"
-                      id="fondo"
-                      label="Notas de fondo"
-                      value={producto.notasfondo}
                       type="text"
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      onChange={handleCompChange('notasfondo')}
-                      inputRef={refs.notasfondo}
+                      key={textFields[17].name}
+                      name={textFields[17].name}
+                      label={textFields[17].label}
+                      value={producto[textFields[17].name]}
+                      onChange={handleCompChange(textFields[17].name)}
+                      inputRef={el => inputRefs.current['notasfondo'] = el}  
                     />
                   </Grid>
                 </Grid>
@@ -739,16 +776,17 @@ export default function AltaCatalogo(props) {
                   <Grid item xs={12} sm={12}>
                     <TextField
                       margin="normal"
-                      id="salida"
-                      label="Notas de salida"
-                      value={producto.notassalida}
                       type="text"
                       fullWidth
                       InputLabelProps={{
                         shrink: true,
                       }}
-                      onChange={handleCompChange('notassalida')}
-                      inputRef={refs.notassalida}
+                      key={textFields[18].name}
+                      name={textFields[18].name}
+                      label={textFields[18].label}
+                      value={producto[textFields[18].name]}
+                      onChange={handleCompChange(textFields[18].name)}
+                      inputRef={el => inputRefs.current['notassalida'] = el} 
                     />
                   </Grid>
                 </Grid>
