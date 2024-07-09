@@ -5,6 +5,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import AltaCatalogo from "./AltaCatalogo";
 import { esES } from "@mui/x-data-grid/locales";
 
+import axios from "axios";
+
 export default function Catalogo() {
   const [rows, setRows] = useState([]);
   const [show, setShow] = useState(false);
@@ -18,15 +20,15 @@ export default function Catalogo() {
       editable: false,
     },
     {
-      field: "barcode",
-      headerName: "Barcode",
+      field: "nombre",
+      headerName: "Nombre del Producto",
       width: 150,
       editable: false,
     },
     {
-      field: "foto",
-      headerName: "Imagen",
-      width: 200,
+      field: "barcode",
+      headerName: "Código de Barras",
+      width: 150,
       editable: false,
     },
     {
@@ -36,14 +38,14 @@ export default function Catalogo() {
       editable: false,
     },
     {
-      field: "producto",
-      headerName: "Producto",
-      width: 150,
+      field: "genero",
+      headerName: "Género",
+      width: 200,
       editable: false,
     },
     {
-      field: "genero",
-      headerName: "Género",
+      field: "presentacion",
+      headerName: "Presentación",
       width: 150,
       editable: false,
     },
@@ -54,20 +56,32 @@ export default function Catalogo() {
       editable: false,
     },
     {
-      field: "tipo",
-      headerName: "Tipo",
-      width: 150,
-      editable: false,
-    },
-    {
-      field: "prsentacion",
-      headerName: "Presentación",
-      width: 150,
-      editable: false,
-    },
-    {
       field: "pais",
-      headerName: "País de origen",
+      headerName: "País",
+      width: 150,
+      editable: false,
+    },
+    {
+      field: "almacen",
+      headerName: "Almacen",
+      width: 150,
+      editable: false,
+    },
+    {
+      field: "ubicacion",
+      headerName: "Ubicación",
+      width: 150,
+      editable: false,
+    },
+    {
+      field: "minimo",
+      headerName: "Mínimo",
+      width: 150,
+      editable: false,
+    },
+    {
+      field: "maximo",
+      headerName: "Máximo",
       width: 150,
       editable: false,
     },
@@ -87,6 +101,19 @@ export default function Catalogo() {
       renderCell: (params) => {},
     },
   ];
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5784/v1/compras/catalogo");
+        const data = response.data;
+        setRows(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleOpenDialog = () => {
     setShow(true);
@@ -126,7 +153,7 @@ export default function Catalogo() {
             rows={rows}
             columns={columns}
             pageSize={15}
-            rowsPerPageOptions={[5, 10, 15, 20]}
+            rowsPerPageOptions={[15, 30, 45, 60,75, 90]}
             checkboxSelection
             disableSelectionOnClick
             initialState={{
