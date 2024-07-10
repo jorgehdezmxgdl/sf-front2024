@@ -15,13 +15,6 @@ export default function AltaRequisicion(props) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  const initialRows = [
-    { id: uuidv4(), name: 'Artículo 1', quantity: 1, price: 100 },
-    { id: uuidv4(), name: 'Artículo 2', quantity: 2, price: 200 },
-  ];
-
-  const articleOptions = ['Artículo 1', 'Artículo 2', 'Artículo 3'];
-
   const [rows, setRows] = React.useState(initialRows);
 
   const handleEditCellChange = (params) => {

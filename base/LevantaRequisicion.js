@@ -39,7 +39,6 @@ export default function LevantaRequisicion(props) {
   function isObject(variable) {
     return variable !== null && typeof variable === 'object';
   }
-
   const handleAutocompleteChange = (event, newValue) => {
     if (isObject(newValue)) {
       setAutocompleteValue(newValue.label);
@@ -217,27 +216,16 @@ export default function LevantaRequisicion(props) {
                     aria-label="lab API tabs example"
                   >
                     <Tab label="Productos para adquirir" value="1" />
-                    <Tab label="Observaciones" value="2" />
+                    <Tab label="Observaciones" value="3" />
                   </TabList>
                 </Box>
                 <TabPanel value="1">
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
                       <Box style={{ flexGrow: 1 }}>
-                        <Autocomplete
-                          id="combo-box-demo"
-                          options={listado}
-                          getOptionLabel={(option) => option.label}
-                          style={{ width: "100%" }}
-                         
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Producto"
-                              variant="outlined"
-                            />
-                          )}  
-                        />
+                        <Button onClick={handleClickOpen2}>
+                          <AddIcon />
+                        </Button>
                         <DataGrid
                           style={{ height: '100%', width: '100%' }}
                           rows={rows}
@@ -249,22 +237,16 @@ export default function LevantaRequisicion(props) {
                           disableSelectionOnClick
                         />
                       </Box>
+                      <Box display="flex" justifyContent="flex-end" padding={2}>
+                        <Typography variant="h6">
+                          Total de la compra: ${totalPurchase.toFixed(2)}
+                        </Typography>
+                      </Box>
                     </Grid>
                   </Grid>
                 </TabPanel>
-                <TabPanel value="2">
-                   <Typography variant="body1" color="initial">
-                        Observaciones
-                   </Typography>
-                  <TextField
-                      id="outlined-multiline-static"
-                      multiline
-                      rows={4}
-                      fullWidth
-                      variant="outlined"
-                      placeholder="Escribe aquí tus observaciones"
-                    />
-                </TabPanel>   
+                <TabPanel value="2">Proveedor</TabPanel>
+                <TabPanel value="3">Observaciones</TabPanel>
               </TabContext>
             </Box>
           </DialogContentText>
