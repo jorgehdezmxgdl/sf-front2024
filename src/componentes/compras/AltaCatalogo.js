@@ -46,7 +46,10 @@ export default function AltaCatalogo(props) {
   const [presenta, setPresenta] = React.useState([]);
   const [formErrors, setFormErrors] = React.useState({});
   
-
+  const [notacorazon, setNotaCorazon] = React.useState([]);
+  const [notafondo, setNotaFondo] = React.useState([]);
+  const [notasalida, setNotaSalida] = React.useState([]);
+  
 
   const [producto, setProducto] = React.useState({
     sku: 1,
@@ -67,9 +70,9 @@ export default function AltaCatalogo(props) {
     ubicacion: "",
     minimo: 0,
     maximo: 0,
-    notascorazon: "",
-    notasfondo: "",
-    notassalida: ""
+    notascorazon: notacorazon,
+    notasfondo: notafondo,
+    notassalida: notasalida
   });
 
   const inputRefs = useRef({});
@@ -308,11 +311,22 @@ export default function AltaCatalogo(props) {
     { name: 'ubicacion', label: 'Ubicación' },
     { name: 'minimo', label: 'Mínimo' },
     { name: 'maximo', label: 'Máximo' },
-    { name: 'notascorazon', label: 'Notas corazón' },
-    { name: 'notasfondo', label: 'Notas fondo' },
-    { name: 'notassalida', label: 'Nota Salida' },
   ], []);
 
+  const handleNotaSalida = (dato) => {
+    setNotaSalida(dato);
+    console.log("Nota de salida:", notasalida);
+  };
+
+  const handleNotaCorazon = (dato) => {
+    setNotaCorazon(dato);
+    console.log("Nota de corazón:", notacorazon);
+  };
+
+  const handleNotaFondo = (dato) => {
+    setNotaFondo(dato);
+    console.log("Nota de fondo:", notafondo);
+  };
 
   return (
     <Dialog
@@ -742,7 +756,7 @@ export default function AltaCatalogo(props) {
               <CustomTabPanel value={value} index={2}>
               <Grid container spacing={2}>
                   <Grid item xs={12} sm={12}>
-                    <PerfumesNotes />
+                    <PerfumesNotes  handleNotaCorazon={handleNotaCorazon} handleNotaFondo={handleNotaFondo} handleNotaSalida={handleNotaSalida} />
                   </Grid> 
                 </Grid>
               </CustomTabPanel>
