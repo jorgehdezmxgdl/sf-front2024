@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Box, Button, Grid } from "@mui/material";
+import { Avatar, Box, Button, Grid } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import AltaCatalogo from "./AltaCatalogo";
 import { esES } from "@mui/x-data-grid/locales";
 
 import axios from "axios";
+import { render } from "@testing-library/react";
 
 export default function Catalogo() {
   const [rows, setRows] = useState([]);
@@ -16,19 +17,31 @@ export default function Catalogo() {
     {
       field: "sku",
       headerName: "SKU",
-      width: 190,
+      width: 140,
+      editable: false,
+    },
+    {
+      field: "foto",
+      headerName: "Imagen",
+      width: 100,
+      editable: false,
+      renderCell: (params) => {
+        return (
+          <Avatar src={params.value} 
+             sx={{ width: 50, height: 50 }} />
+        );
+      },
+    },
+    {
+      field: "estatus",
+      headerName: "Estatus",
+      width: 150,
       editable: false,
     },
     {
       field: "nombre",
       headerName: "Nombre del Producto",
-      width: 150,
-      editable: false,
-    },
-    {
-      field: "barcode",
-      headerName: "Código de Barras",
-      width: 150,
+      width: 230,
       editable: false,
     },
     {
@@ -62,18 +75,6 @@ export default function Catalogo() {
       editable: false,
     },
     {
-      field: "almacen",
-      headerName: "Almacen",
-      width: 150,
-      editable: false,
-    },
-    {
-      field: "ubicacion",
-      headerName: "Ubicación",
-      width: 150,
-      editable: false,
-    },
-    {
       field: "minimo",
       headerName: "Mínimo",
       width: 150,
@@ -86,10 +87,13 @@ export default function Catalogo() {
       editable: false,
     },
     {
-      field: "estatus",
-      headerName: "Estatus",
+      field: "activo",
+      headerName: "Activo",
       width: 150,
       editable: false,
+      renderCell: (params) => {
+        return params.value ? "Si" : "No";
+      },
     },
     {
       field: "actions",

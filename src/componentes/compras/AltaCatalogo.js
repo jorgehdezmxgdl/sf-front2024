@@ -18,18 +18,21 @@ import {
   MenuItem,
   CardActions,
   IconButton,
+  Autocomplete,
+  Checkbox, Link,
 } from "@mui/material";
 
-
-import  PerfumesNotes  from './PerfumesNotes';
-
+import { styled } from '@mui/system';
 import PropTypes from "prop-types";
 
 import axios from "axios";
 
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon, CheckBox as CheckBoxIcon } from '@mui/icons-material';
+import PerfumeNotes from "./PerfumesNotes";
 
 
 export default function AltaCatalogo(props) {
@@ -44,12 +47,19 @@ export default function AltaCatalogo(props) {
   const [ubicacion, setUbicacion] = React.useState([]);
   const [tipo, setTipo] = React.useState([]);
   const [presenta, setPresenta] = React.useState([]);
+  const [options, setOptions]    = React.useState([]);
   const [formErrors, setFormErrors] = React.useState({});
-  
-  const [notacorazon, setNotaCorazon] = React.useState([]);
-  const [notafondo, setNotaFondo] = React.useState([]);
-  const [notasalida, setNotaSalida] = React.useState([]);
-  
+  const [selectedOptions, setSelectedOptions]   = React.useState([]);
+  const [selectedOptions1, setSelectedOptions1] = React.useState([]);
+  const [selectedOptions2, setSelectedOptions2] = React.useState([]);
+  const [dialogData, setDialogData] = useState({ muestra: 0, titulo: "" });
+  const [dialogOpen, setDialogOpen] = useState(false); 
+
+  const GroupHeader = styled('div')({
+    backgroundColor: '#8d4925',
+    color: 'white',
+    padding: '2px',
+  });
 
   const [producto, setProducto] = React.useState({
     sku: 1,
@@ -70,9 +80,6 @@ export default function AltaCatalogo(props) {
     ubicacion: "",
     minimo: 0,
     maximo: 0,
-    notascorazon: notacorazon,
-    notasfondo: notafondo,
-    notassalida: notasalida
   });
 
   const inputRefs = useRef({});
@@ -120,7 +127,6 @@ export default function AltaCatalogo(props) {
       } catch (error) {
         console.error("Error al buscar datos:", error);
       }
-
       try {
         const response = await axios.get(`http://localhost:5784/disenador`);
         const data = response.data;
@@ -171,9 +177,18 @@ export default function AltaCatalogo(props) {
       } catch (error) {
         console.error("Error al buscar datos:", error);
       }
+      try {
+        const response = await axios.get(`http://localhost:5784/v1/compras/notasolfativas`);
+        const data = response.data;
+        setOptions(data);
+      } catch (error) {
+        console.error("Error al buscar datos:", error);
+      }
     };
     fetchData();
   }, []);
+
+  const memoizedOptions = React.useMemo(() => options, [options]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -225,19 +240,23 @@ export default function AltaCatalogo(props) {
   const handleBlur = () => {
     handleCalculaVolumen();
   };
-
+ 
   function encontrarCamposVacios() {
+    console.log("Producto:", producto);
     const campos = Object.keys(producto);
     const camposVacios = campos.filter(
-      (campo) => producto[campo] === "" || producto[campo] === null || producto[campo] === 0
+      (campo) => producto[campo] === "" || producto[campo] === null || producto[campo] === 0 || (Array.isArray(producto[campo]) && producto[campo].length === 0)
     );
     return camposVacios;
   }
 
   const handleSubmit = (event) => {
+    event.preventDefault();    
     const errores = {};
     const camposVacios = encontrarCamposVacios();
-    console.log("Campos vacíos:", camposVacios);
+    selectedOptions.length === 0 && (errores['notacorazon'] = 'Seleccione al menos una nota olfativa');
+    selectedOptions1.length === 0 && (errores['notafondo'] = 'Seleccione al menos una nota olfativa');
+    selectedOptions2.length === 0 && (errores['notasalida'] = 'Seleccione al menos una nota olfativa');
     if (camposVacios.length > 0) {
       camposVacios.map((campo) => {
         errores[campo] = " es obligatorio este dato";
@@ -293,6 +312,14 @@ export default function AltaCatalogo(props) {
     }, 0);
   }, []);
 
+  const handleOpenDialog = (muestra, titulo) => {
+      setDialogData({ muestra, titulo }); 
+      setDialogOpen(true); 
+  };
+    
+  const handleCloseDialog = () => {
+    setDialogOpen(false); 
+  };
 
   const textFields = useMemo(() => [
     { name: 'nombre', label: 'Nombre del Producto', type: 'text' },
@@ -311,22 +338,11 @@ export default function AltaCatalogo(props) {
     { name: 'ubicacion', label: 'Ubicación' },
     { name: 'minimo', label: 'Mínimo' },
     { name: 'maximo', label: 'Máximo' },
+    { name: 'notacorazon', label: 'Notas de corazón' },
+    { name: 'notafondo', label: 'Notas de Fondo' },
+    { name: 'notasalida', label: 'Notas de Salida' },
   ], []);
 
-  const handleNotaSalida = (dato) => {
-    setNotaSalida(dato);
-    console.log("Nota de salida:", notasalida);
-  };
-
-  const handleNotaCorazon = (dato) => {
-    setNotaCorazon(dato);
-    console.log("Nota de corazón:", notacorazon);
-  };
-
-  const handleNotaFondo = (dato) => {
-    setNotaFondo(dato);
-    console.log("Nota de fondo:", notafondo);
-  };
 
   return (
     <Dialog
@@ -399,7 +415,7 @@ export default function AltaCatalogo(props) {
                   </Grid>
                 </Grid>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={12}>
+                  <Grid item xs={7} sm={7}>
                     <TextField
                       margin="normal"
                       id="barcode"
@@ -416,6 +432,31 @@ export default function AltaCatalogo(props) {
                       inputRef={el => inputRefs.current['barcode'] = el}
                     />
                   </Grid>
+                  <Grid item xs={5} sm={5}>
+                      <Box display="flex" alignItems="center" height="100%">
+                        <Button variant="contained"
+                                margin="normal"
+                                fullWidth 
+                                fullHeight
+                                color="primary">
+                          Código Temporal
+                        </Button>
+                      </Box>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2}>
+                   <Grid item xs={12} sm={12}>
+                        <Box display="flex" justifyContent="flex-end"> 
+                          <Link
+                            variant="body1"
+                            underline="hover"
+                            style={{ cursor: 'pointer' }}
+                            rel="noopener noreferrer"
+                          >
+                            Adicionar más de 1 código de barras
+                          </Link>
+                        </Box>
+                   </Grid>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Grid container spacing={2}>
@@ -748,17 +789,192 @@ export default function AltaCatalogo(props) {
                         InputLabelProps={{
                           shrink: true,
                         }}
+                        key={textFields[15].name}
+                        name={textFields[15].name}
+                        label={textFields[15].label}
+                        value={producto[textFields[15].name]}
+                        onChange={handleCompChange(textFields[15].name)}
+                        inputRef={el => inputRefs.current['maximo'] = el}
                       />
                     </Grid>
                   </Grid>
                 </Grid>
               </CustomTabPanel>
               <CustomTabPanel value={value} index={2}>
-              <Grid container spacing={2}>
+                <Grid container spacing={2}>
                   <Grid item xs={12} sm={12}>
-                    <PerfumesNotes  handleNotaCorazon={handleNotaCorazon} handleNotaFondo={handleNotaFondo} handleNotaSalida={handleNotaSalida} />
-                  </Grid> 
+                    <Box display="flex" justifyContent="flex-end">
+                        <Link
+                          variant="body1"
+                          underline="hover"
+                          rel="noopener noreferrer" 
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => handleOpenDialog(1, "Notas de corazón")}
+                        >
+                          <LiveHelpIcon />
+                        </Link>
+                    </Box>
+                    <Autocomplete
+                      multiple
+                      options={memoizedOptions}
+                      groupBy={(option) => option.categoria}
+                      getOptionLabel={(option) => option.nombre}
+                      renderOption={(props, option, { selected }) => (
+                        <li {...props}>
+                          <Checkbox
+                            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                            checkedIcon={<CheckBoxIcon fontSize="small" />}
+                            style={{ marginRight: 8 }}
+                            checked={selected}
+                          />
+                          {option.nombre}
+                        </li>
+                      )}
+                      renderGroup={(params) => (
+                        <li key={params.key}>
+                          <GroupHeader>{params.group}</GroupHeader>
+                          <ul style={{ padding: 0 }}>{params.children}</ul>
+                        </li>
+                      )}
+                      renderInput={(params) => (
+                        <TextField {...params}
+                          variant="outlined"
+                          placeholder="Seleccione..."
+                          margin="normal"
+                          key={textFields[16].name}
+                          name={textFields[16].name}
+                          label={textFields[16].label}                   
+                          inputRef={el => inputRefs.current['notacorazon'] = el}
+                          fullWidth
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />
+                      )}
+                      value={selectedOptions}
+                      onChange={(event, newValue) => {
+                        setSelectedOptions(newValue);
+                      }}                     
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={12}>
+                    <Box display="flex" justifyContent="flex-end">
+                        <Link
+                          variant="body1"
+                          underline="hover"
+                          target="_blank"
+                          rel="noopener noreferrer" 
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => handleOpenDialog(2, "Notas de fondo")}
+                        >
+                          <LiveHelpIcon />
+                        </Link>
+                    </Box>
+                    <Autocomplete
+                      multiple
+                      options={memoizedOptions}
+                      groupBy={(option) => option.categoria}
+                      getOptionLabel={(option) => option.nombre}
+                      renderOption={(props, option, { selected }) => (
+                        <li {...props}>
+                          <Checkbox
+                            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                            checkedIcon={<CheckBoxIcon fontSize="small" />}
+                            style={{ marginRight: 8 }}
+                            checked={selected}
+                          />
+                          {option.nombre}
+                        </li>
+                      )}
+                      renderGroup={(params) => (
+                        <li key={params.key}>
+                          <GroupHeader>{params.group}</GroupHeader>
+                          <ul style={{ padding: 0 }}>{params.children}</ul>
+                        </li>
+                      )}
+                      renderInput={(params) => (
+                        <TextField {...params}
+                          variant="outlined"
+                          key={textFields[17].name}
+                          name={textFields[17].name}
+                          label={textFields[17].label}                   
+                          inputRef={el => inputRefs.current['notafondo'] = el}
+                          placeholder="Seleccione..."
+                          margin="normal"
+                          fullWidth
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />
+                      )}
+                      value={selectedOptions1}
+                      onChange={(event, newValue) => {
+                        setSelectedOptions1(newValue);
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={12}>
+                    <Box display="flex" justifyContent="flex-end">
+                        <Link
+                          variant="body1"
+                          underline="hover"
+                          style={{ cursor: 'pointer' }}
+                          rel="noopener noreferrer" 
+                          onClick={() => handleOpenDialog(3, "Notas de salida")} 
+                        >
+                          <LiveHelpIcon />
+                        </Link>
+                    </Box>
+                    <Autocomplete
+                      multiple
+                      options={memoizedOptions}
+                      groupBy={(option) => option.categoria}
+                      getOptionLabel={(option) => option.nombre}
+                      renderOption={(props, option, { selected }) => (
+                        <li {...props}>
+                          <Checkbox
+                            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                            checkedIcon={<CheckBoxIcon fontSize="small" />}
+                            style={{ marginRight: 8 }}
+                            checked={selected}
+                          />
+                          {option.nombre}
+                        </li>
+                      )}
+                      renderGroup={(params) => (
+                        <li key={params.key}>
+                          <GroupHeader>{params.group}</GroupHeader>
+                          <ul style={{ padding: 0 }}>{params.children}</ul>
+                        </li>
+                      )}
+                      renderInput={(params) => (
+                        <TextField {...params}
+                          variant="outlined"
+                          placeholder="Seleccione..."
+                          margin="normal"
+                          key={textFields[18].name}
+                          name={textFields[18].name}
+                          label={textFields[18].label}                   
+                          inputRef={el => inputRefs.current['notasalida'] = el}
+                          fullWidth
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />
+                      )}
+                      value={selectedOptions2}
+                      onChange={(event, newValue) => {
+                        setSelectedOptions2(newValue);
+                      }}
+                    />
+                  </Grid>
                 </Grid>
+                <PerfumeNotes 
+                    open={dialogOpen} 
+                    muestra={dialogData.muestra} 
+                    titulo={dialogData.titulo} 
+                    onClose={handleCloseDialog} 
+                />
               </CustomTabPanel>
               <CustomTabPanel value={value} index={3}>
                 <Box sx={{ p: 2 }}>
