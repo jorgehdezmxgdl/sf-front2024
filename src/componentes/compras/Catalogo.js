@@ -157,8 +157,8 @@ export default function Catalogo() {
             rows={rows}
             columns={columns}
             pageSize={15}
+            checkboxSelection={false}
             rowsPerPageOptions={[15, 30, 45, 60,75, 90]}
-            checkboxSelection
             disableSelectionOnClick
             initialState={{
               pagination: {
