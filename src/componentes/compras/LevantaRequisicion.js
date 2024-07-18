@@ -33,8 +33,8 @@ export default function LevantaRequisicion(props) {
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [listado, setListado] = React.useState([]);
   const [value, setValue] = React.useState("1");
-  const [autocompleteValue, setAutocompleteValue] = React.useState(null);
-  let   valor = 0;	
+  const [autocompleteValue, setAutocompleteValue] = React.useState('');
+  let valor = 0;
 
   function isObject(variable) {
     return variable !== null && typeof variable === 'object';
@@ -42,7 +42,7 @@ export default function LevantaRequisicion(props) {
 
   const handleAutocompleteChange = (event, newValue) => {
     if (isObject(newValue)) {
-      setAutocompleteValue(newValue.label);
+      setAutocompleteValue(newValue.name);
       setNewRow({
         ...newRow,
         name: newValue.label,
@@ -64,7 +64,6 @@ export default function LevantaRequisicion(props) {
   const [newRow, setNewRow] = React.useState({
     name: "",
     quantity: "",
-    price: "",
   });
 
   React.useEffect(() => {
@@ -73,7 +72,7 @@ export default function LevantaRequisicion(props) {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:5784/disenador2");
+      const response = await axios.get("http://localhost:5784/v1/compras/productos");
       setListado(response.data || []);
     } catch (error) {
       console.error("Error al buscar datos:", error);
@@ -88,13 +87,10 @@ export default function LevantaRequisicion(props) {
         id: newId,
         ...newRow,
         quantity: parseFloat(newRow.quantity),
-        price: parseFloat(newRow.price),
-        name: autocompleteValue,
       },
     ];
     setRows(updatedRows);
-    updateTotalPurchase(updatedRows);
-    setNewRow({ name: "", quantity: "", price: "" });
+    setNewRow({ name: "", quantity: "" });
     setAutocompleteValue("");
   };
 
@@ -139,9 +135,9 @@ export default function LevantaRequisicion(props) {
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     {
-      field: "name",
-      headerName: "Nombre del Producto",
-      width: 600,
+      field: "sku",
+      headerName: "SKU",
+      width: 100,
       editable: false,
     },
     {
@@ -150,14 +146,6 @@ export default function LevantaRequisicion(props) {
       width: 130,
       editable: true,
       type: "number",
-    },
-    {
-      field: "price",
-      headerName: "Precio",
-      width: 130,
-      editable: true,
-      type: "number",
-      renderCell: (params) => formatCurrency(params.value),
     },
     {
       field: "actions",
@@ -221,50 +209,85 @@ export default function LevantaRequisicion(props) {
                   </TabList>
                 </Box>
                 <TabPanel value="1">
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <Box style={{ flexGrow: 1 }}>
-                        <Autocomplete
-                          id="combo-box-demo"
-                          options={listado}
-                          getOptionLabel={(option) => option.label}
-                          style={{ width: "100%" }}
-                         
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Producto"
-                              variant="outlined"
-                            />
-                          )}  
-                        />
-                        <DataGrid
-                          style={{ height: '100%', width: '100%' }}
-                          rows={rows}
-                          columns={columns}
-                          editMode="row"
-                          onEditCellChangeCommitted={handleEditCellChange}
-                          onCellEditCommit={handleCellEditCommit}
-                          autoHeight
-                          disableSelectionOnClick
-                        />
-                      </Box>
+
+                  <Grid item xs={12} sm={12}>
+                    <Grid item xs={8} sm={8}>
+                      <Autocomplete
+                        id="combo-box-demo"
+                        options={listado}
+                        getOptionLabel={(option) => option.sku}
+                        style={{ width: "100%" }}
+
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Producto"
+                            variant="outlined"
+                           
+                            
+                          />
+                        )}
+                        value={newRow.name}
+                        onChange={(e) =>
+                          { 
+                           setAutocompleteValue(e.target.value);
+                           setNewRow({ ...newRow, name: e.target.value });
+                           console.log("newRow", newRow);
+                           console.log("autocompleteValue", autocompleteValue);  
+                           
+                          }
+                         }
+                      />
                     </Grid>
+                    <Grid item xs={2} sm={2}>
+                      <TextField
+                        id="Cantidad"
+                        label="Cantidad"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={newRow.quantity}
+                        onChange={(e) =>
+                            setNewRow({ ...newRow, quantity: e.target.value })
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={2} sm={2}>
+                      <Button variant="text"
+                            onClick={handleAddRow}
+                            color="primary">
+                        Adicionar
+                      </Button>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12} sm={12}>
+
+                    <DataGrid
+                      style={{ height: '100%', width: '100%' }}
+                      rows={rows}
+                      columns={columns}
+                      editMode="row"
+                      onEditCellChangeCommitted={handleEditCellChange}
+                      onCellEditCommit={handleCellEditCommit}
+                      autoHeight
+                      disableSelectionOnClick
+                    />
+
                   </Grid>
                 </TabPanel>
                 <TabPanel value="2">
-                   <Typography variant="body1" color="initial">
-                        Observaciones
-                   </Typography>
+                  <Typography variant="body1" color="initial">
+                    Justificación  (*)
+                  </Typography>
                   <TextField
-                      id="outlined-multiline-static"
-                      multiline
-                      rows={4}
-                      fullWidth
-                      variant="outlined"
-                      placeholder="Escribe aquí tus observaciones"
-                    />
-                </TabPanel>   
+                    id="outlined-multiline-static"
+                    multiline
+                    rows={4}
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Escribe aquí tus observaciones"
+                  />
+                </TabPanel>
               </TabContext>
             </Box>
           </DialogContentText>
@@ -283,6 +306,6 @@ export default function LevantaRequisicion(props) {
         </DialogActions>
       </Dialog>
       {open2 && <BuscaProveedor handleCloseOpen2={handleCloseOpen2} open2={open2} />}
-    </>  
+    </>
   );
 }

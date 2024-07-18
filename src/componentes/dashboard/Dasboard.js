@@ -21,6 +21,7 @@ import Requisicion from "../compras/Requisicion";
 import Compra from "../compras/Compra";
 import Visor from "../utilities/Visor";
 import DataGeneral from "./DataGeneral";
+import Licitaciones from "../compras/Licitaciones";
 
 const drawerWidth = 240;
 
@@ -37,6 +38,7 @@ export default function App() {
     5: Requisicion,
     6: Compra,
     7: Visor,
+    8: Licitaciones
   };
 
   const toggleDrawer = () => {

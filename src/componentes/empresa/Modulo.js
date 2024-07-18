@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogActions,
   DialogContent,
-  DialogContentText,
+  DialogContentText, Tooltip,
 } from "@mui/material";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -44,7 +44,17 @@ export default function MiModulo(props) {
     activo: false,
   });
 
-  const { nombre, activo } = formData;
+  const [errors, setErrors] = useState({
+    nombre: false
+  });
+
+  const validate = () => {
+    let nombreError = formData.nombre === "";
+    setErrors({
+      nombre: nombreError,
+    });
+    return !nombreError;
+  };
 
   const columns = [
     { field: "id", headerName: "ID", width: 40 },
@@ -104,7 +114,6 @@ export default function MiModulo(props) {
       1: 'Habilitado',
       0: 'Deshabilitado'
     };
-  
     return estados[valor] || 'Estado desconocido';  // Retorna 'Estado desconocido' si el valor no es 0 o 1
   }
 
@@ -119,7 +128,6 @@ export default function MiModulo(props) {
         }     
       } catch (error) {
         console.error('Error al obtener los datos:', error);
-        // Puedes manejar errores o mostrar mensajes de error aquí
       }
     };
     fetchData();
@@ -177,27 +185,32 @@ export default function MiModulo(props) {
           component: "form",
           onSubmit: async (event) => {
             event.preventDefault();            
-            const response = await axios.post("http://127.0.0.1:5784/modulos", {"nombre" : nombre, "activo" : isChecked});
-            try {
-              console.log('Código de estado:', response.status); // Muestra el código de estado de la respuesta
-        
-              if (response.status === 200) {
-                console.log('Datos enviados correctamente:', response.data);
-                setFetchTrigger(prev => prev + 1);
-              } else {
-                console.log('Respuesta recibida con el código de estado:', response.status);
-              }
-            } catch (error) {
-              if (error.response) {
-                console.error('Error en la respuesta:', error.response.status);
-                console.log('El servidor', error.response);
-              } else if (error.request) {
-                console.error('No se recibió respuesta del servidor');
-              } else {
-                console.error('Error al configurar la solicitud:', error.message);
-              }
+            if (validate()) {
+                const response = await axios.post("http://127.0.0.1:5784/modulos", {"nombre" : formData.nombre, "activo" : formData.activo});
+                if (formData.nombre === "") {
+                  alert("Error ");    
+                }
+                try {
+                  console.log("RESPONSE: ");
+                  console.log(response);
+                  alert(response);
+                  if (response.status === 200) {
+                    setFetchTrigger(prev => prev + 1);
+                  } else {
+                    console.log('Respuesta recibida con el código de estado:', response.status);
+                  }
+                } catch (error) {
+                  if (error.response) {
+                    console.error('Error en la respuesta:', error.response.status);
+                    console.log('El servidor', error.response);
+                  } else if (error.request) {
+                    console.error('No se recibió respuesta del servidor');
+                  } else {
+                    console.error('Error al configurar la solicitud:', error.message);
+                  }
+                }
+                handleClickClose();
             }
-            handleClickClose();
           },
         }}
       >
@@ -216,10 +229,12 @@ export default function MiModulo(props) {
                 InputLabelProps={{
                   shrink: true,
                 }}
-                value={nombre}
+                value={formData.nombre}
                 onChange={(e) =>
-                  setFormData({ ...formData, nombre: e.target.value })
+                  setFormData({ ...formData, nombre: e.target.value.toUpperCase() })
                 }
+                error={errors.nombre}
+                helperText={errors.nombre ? 'Este campo es obligatorio' : ''}
               />
             </div>
           </Grid>
@@ -232,6 +247,7 @@ export default function MiModulo(props) {
                       inputProps={{ "aria-label": "controlled" }}
                       checked={isChecked}
                       onChange={handleChangeChecked}
+                      value={formData.activo}
                     />
                   }
                   label="Activar módulo"

@@ -33,6 +33,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon, CheckBox as CheckBoxIcon } from '@mui/icons-material';
 import PerfumeNotes from "./PerfumesNotes";
+import CodigoBarras from "./CodigoBarras";
 
 
 export default function AltaCatalogo(props) {
@@ -53,7 +54,9 @@ export default function AltaCatalogo(props) {
   const [selectedOptions1, setSelectedOptions1] = React.useState([]);
   const [selectedOptions2, setSelectedOptions2] = React.useState([]);
   const [dialogData, setDialogData] = useState({ muestra: 0, titulo: "" });
-  const [dialogOpen, setDialogOpen] = useState(false); 
+  const [dialogOpen,  setDialogOpen] = useState(false); 
+  const [dialogBarra, setDialogBarra] = useState(false); 
+  
 
   const GroupHeader = styled('div')({
     backgroundColor: '#8d4925',
@@ -76,10 +79,6 @@ export default function AltaCatalogo(props) {
     presentacion: 0,
     ml: 0,
     pais: 75,
-    almacen: 5,
-    ubicacion: "",
-    minimo: 0,
-    maximo: 0,
   });
 
   const inputRefs = useRef({});
@@ -321,6 +320,19 @@ export default function AltaCatalogo(props) {
     setDialogOpen(false); 
   };
 
+  const handleCodigoBarras = () => {
+    setDialogBarra(true);
+  };
+
+  const handleCloseCodigoBarras = () => {
+    setDialogBarra(false);
+  };
+
+  const handleAdd = () => {
+    handleCodigoBarras();
+  };
+
+
   const textFields = useMemo(() => [
     { name: 'nombre', label: 'Nombre del Producto', type: 'text' },
     { name: 'disenador', label: 'Diseñador', type: 'int' },
@@ -363,7 +375,6 @@ export default function AltaCatalogo(props) {
                 aria-label="basic tabs example"
               >
                 <Tab label="Datos generales" {...a11yProps(0)} />
-                <Tab label="Almacen" {...a11yProps(1)} />
                 <Tab label="Notas olfativas" {...a11yProps(1)} />
                 <Tab label="Fotos" {...a11yProps(2)} />
               </Tabs>
@@ -443,20 +454,6 @@ export default function AltaCatalogo(props) {
                         </Button>
                       </Box>
                   </Grid>
-                </Grid>
-                <Grid container spacing={2}>
-                   <Grid item xs={12} sm={12}>
-                        <Box display="flex" justifyContent="flex-end"> 
-                          <Link
-                            variant="body1"
-                            underline="hover"
-                            style={{ cursor: 'pointer' }}
-                            rel="noopener noreferrer"
-                          >
-                            Adicionar más de 1 código de barras
-                          </Link>
-                        </Box>
-                   </Grid>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Grid container spacing={2}>
@@ -698,111 +695,6 @@ export default function AltaCatalogo(props) {
               <CustomTabPanel value={value} index={1}>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={12}>
-                    <TextField
-                      margin="normal"
-                      select
-                      fullWidth
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                      key={textFields[12].name}
-                      name={textFields[12].name}
-                      label={textFields[12].label}
-                      value={producto[textFields[12].name]}
-                      onChange={handleCompChange(textFields[12].name)}
-                      inputRef={el => inputRefs.current['almacen'] = el}
-                    >
-                      {almacen.map((item, index) => (
-                        <MenuItem key={index} value={item.id}>
-                          {item.nombre}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={12}>
-                    <TextField
-                      margin="normal"
-                      fullWidth
-                      select
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      key={textFields[13].name}
-                      name={textFields[13].name}
-                      label={textFields[13].label}
-                      value={producto[textFields[13].name]}
-                      onChange={handleCompChange(textFields[13].name)}
-                      inputRef={el => inputRefs.current['ubicacion'] = el}
-                    >
-                      {ubicacion.map((item, index) => (
-                        <MenuItem key={index} value={item.id}>
-                          {item.nombre}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        margin="normal"
-                        InputProps={{
-                          inputMode: "numeric",
-                          pattern: "[0-9]*",
-                          endAdornment: (
-                            <InputAdornment position="start">
-                              pzs
-                            </InputAdornment>
-                          ),
-                        }}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        key={textFields[14].name}
-                        name={textFields[14].name}
-                        label={textFields[14].label}
-                        value={producto[textFields[14].name]}
-                        onChange={handleCompChange(textFields[14].name)}
-                        inputRef={el => inputRefs.current['minimo'] = el}
-                      />
-                    </Grid>
-                    <Grid item xs={6} sm={6}>
-                      <TextField
-                        fullWidth
-                        margin="normal"
-                        InputProps={{
-                          inputMode: "numeric",
-                          pattern: "[0-9]*",
-                          endAdornment: (
-                            <InputAdornment position="start">
-                              pzs
-                            </InputAdornment>
-                          ),
-                        }}
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        key={textFields[15].name}
-                        name={textFields[15].name}
-                        label={textFields[15].label}
-                        value={producto[textFields[15].name]}
-                        onChange={handleCompChange(textFields[15].name)}
-                        inputRef={el => inputRefs.current['maximo'] = el}
-                      />
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </CustomTabPanel>
-              <CustomTabPanel value={value} index={2}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={12}>
                     <Box display="flex" justifyContent="flex-end">
                         <Link
                           variant="body1"
@@ -976,7 +868,7 @@ export default function AltaCatalogo(props) {
                     onClose={handleCloseDialog} 
                 />
               </CustomTabPanel>
-              <CustomTabPanel value={value} index={3}>
+              <CustomTabPanel value={value} index={2}>
                 <Box sx={{ p: 2 }}>
                   <Typography variant="h5" gutterBottom>
                     Galería de imágenes

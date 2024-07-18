@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -13,6 +13,8 @@ import { Grid, MenuItem, TextField } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import { MuiTelInput } from "mui-tel-input";
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
 
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -22,9 +24,10 @@ import axios from "axios";
 export default function AltaEdiProv(props) {
   const [open, setOpen] = React.useState(true);
   const [value, setValue] = React.useState(0);
-  const [telef_casa, setTelCasa] = useState("");
-  const [paises, setPaises] = useState([]);
-  const [formValues, setFormValues] = useState({
+  const [telef_casa, setTelCasa] = React.useState("");
+  const [paises, setPaises] = React.useState([]);
+  const [bancos, setBancos] = React.useState([]);
+  const [formValues, setFormValues] = React.useState({
     empresa: "",
     rfc: "",
     fiscal: "",
@@ -111,8 +114,9 @@ export default function AltaEdiProv(props) {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.post(`http://localhost:5784/paises`);
-        setPaises(response.data);
+        const response = await axios.get(`http://localhost:5784/v1/compras/bancos`);
+        const data = response.data;
+        setBancos(data);
       } catch (error) {
         console.error("Error al buscar datos:", error);
       }
@@ -138,6 +142,7 @@ export default function AltaEdiProv(props) {
                 <Tab label="Datos personales" {...a11yProps(0)} />
                 <Tab label="Domicilio" {...a11yProps(1)} />
                 <Tab label="Datos de compra" {...a11yProps(2)} />
+                <Tab label="Forma de pago" {...a11yProps(3)} />
               </Tabs>
             </Box>
             <CustomTabPanel value={value} index={0}>
@@ -464,66 +469,240 @@ export default function AltaEdiProv(props) {
               </Grid>
             </CustomTabPanel>
             <CustomTabPanel value={value} index={2}>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  id="dias_credito"
-                  label="Días de crédito"
-                  type="number"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  variant="outlined"
-                  margin="normal"
-                />
+            <Grid container spacing={2}>
+                <Grid item xs={6} md={6}>
+                  <TextField
+                    fullWidth
+                    id="dias_credito"
+                    label="Días de crédito"
+                    type="number"
+                    select
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    variant="outlined"
+                    margin="normal"
+                  />              
+                </Grid>
+                <Grid item xs={6} md={6}>
+                  <TextField
+                    fullWidth
+                    id="limite_credito"
+                    label="Límite de crédito"
+                    type="number"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    variant="outlined"
+                    margin="normal"
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  id="limite_credito"
-                  label="Límite de crédito"
-                  type="number"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  variant="outlined"
-                  margin="normal"
-                />
+              <Grid container spacing={2}>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="descuento"
+                      label="Descuento"
+                      type="number"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="moneda"
+                      select
+                      label="Moneda"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    >
+                      <MenuItem value="MXN">MXN</MenuItem>
+                      <MenuItem value="USD">USD</MenuItem>
+                      <MenuItem value="EURO">EURO</MenuItem>
+                    </TextField>
+                  </Grid>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  id="moneda"
-                  select
-                  label="Moneda"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  variant="outlined"
-                  margin="normal"
-                >
-                  <MenuItem value="MXN">MXN</MenuItem>
-                  <MenuItem value="USD">USD</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  fullWidth
-                  id="metodo_pago"
-                  select
-                  label="Método de pago"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  variant="outlined"
-                  margin="normal"
-                >
-                  <MenuItem value="Efectivo">Efectivo</MenuItem>
-                  <MenuItem value="Transferencia">Transferencia</MenuItem>
-                  <MenuItem value="Cheque">Cheque</MenuItem>
-                  <MenuItem value="Tarjeta">Tarjeta</MenuItem>
-                </TextField>
-              </Grid>
+              <Grid container spacing={2}>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="metodo_pago"
+                      select
+                      label="Termino de pago"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    >                  
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="cobtrofac"
+                      label="Cobro por factura"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="lead_time"
+                      select
+                      label="Lead time(días)"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    >                  
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="tiempo_caducar"
+                      label="Tiempo caducar costo"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+            </Grid>
+            </CustomTabPanel>
+            <CustomTabPanel value={value} index={3}>
+            <Grid container spacing={2}>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="forma"
+                      select
+                      label="Forma de pago"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    >                  
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="titular"
+                      label="Titular de la cuenta"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="banco"
+                      select
+                      label="Banco"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    >     
+                   
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="sucursal"
+                      label="Sucursal"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="cuenta"
+                      label="Cuenta"
+                      type="text"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    >                  
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="clabe"
+                      label="CLABE"
+                      type="text"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+            </Grid>
+            <Divider>
+              <Chip label="Procesos fiscales" size="small" />
+            </Divider>
+            <Grid container spacing={2}>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="tercero"
+                      label="Tipo de tercero"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={6} md={6}>
+                    <TextField
+                      fullWidth
+                      id="tipo_operacion"
+                      label="Tipo de operación"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+            </Grid>
             </CustomTabPanel>
           </Box>
         </DialogContentText>

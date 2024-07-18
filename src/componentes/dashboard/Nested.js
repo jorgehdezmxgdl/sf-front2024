@@ -63,6 +63,10 @@ export default function Nested(props) {
   const handleImprimir = () => {
       props.handleShow(7);
   };
+
+  const handleLicitaciones = () => {
+    props.handleShow(8);
+};
   
   return (
     <List
@@ -102,14 +106,6 @@ export default function Nested(props) {
         <List component="div" disablePadding>
           <ListItemButton sx={{ pl: 4 }}>
             <ListItemIcon>
-              <PaidIcon />
-            </ListItemIcon>
-            <ListItemText primary="Licitaciones" />
-          </ListItemButton>
-        </List>
-        <List component="div" disablePadding>
-          <ListItemButton sx={{ pl: 4 }}>
-            <ListItemIcon>
               <ArticleIcon />
             </ListItemIcon>
             <ListItemText primary="Requisiciones" onClick={handleCompra_Requesiciones} />
@@ -126,9 +122,9 @@ export default function Nested(props) {
         <List component="div" disablePadding>
           <ListItemButton sx={{ pl: 4 }}>
             <ListItemIcon>
-              <AttachMoneyIcon />
+              <PaidIcon />
             </ListItemIcon>
-            <ListItemText primary="Lista de costos" />
+            <ListItemText primary="Licitaciones"  onClick={handleLicitaciones}/>
           </ListItemButton>
         </List>
         <List component="div" disablePadding>
@@ -139,6 +135,16 @@ export default function Nested(props) {
             <ListItemText primary="Importaciones" onClick={handleImprimir} />
           </ListItemButton>
         </List>
+     
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <ListItemIcon>
+              <AttachMoneyIcon />
+            </ListItemIcon>
+            <ListItemText primary="Lista de costos" />
+          </ListItemButton>
+        </List>
+      
         <List component="div" disablePadding>
           <ListItemButton sx={{ pl: 4 }}>
             <ListItemIcon>
