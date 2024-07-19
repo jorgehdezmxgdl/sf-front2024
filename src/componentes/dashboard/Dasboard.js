@@ -22,6 +22,8 @@ import Compra from "../compras/Compra";
 import Visor from "../utilities/Visor";
 import DataGeneral from "./DataGeneral";
 import Licitaciones from "../compras/Licitaciones";
+import Reportes from '../compras/Reportes';
+import Principal from "./Principal";
 
 const drawerWidth = 240;
 
@@ -38,7 +40,8 @@ export default function App() {
     5: Requisicion,
     6: Compra,
     7: Visor,
-    8: Licitaciones
+    8: Licitaciones,
+    9: Reportes 
   };
 
   const toggleDrawer = () => {
@@ -60,6 +63,7 @@ export default function App() {
 
 
   return (
+    /*
     <div style={{ display: "flex", height: "100vh" }}>
       <CssBaseline />
       <AppBar
@@ -112,5 +116,7 @@ export default function App() {
         {ComponentToShow ? <ComponentToShow /> : null}
       </Box>
     </div>
+    */
+   <Principal />
   );
 }

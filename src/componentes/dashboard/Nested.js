@@ -66,7 +66,11 @@ export default function Nested(props) {
 
   const handleLicitaciones = () => {
     props.handleShow(8);
-};
+  };
+
+  const handleReporteCompra = () => {
+    props.handleShow(9);
+  }
   
   return (
     <List
@@ -150,7 +154,7 @@ export default function Nested(props) {
             <ListItemIcon>
               <StackedLineChartIcon />
             </ListItemIcon>
-            <ListItemText primary="Reportes" />
+            <ListItemText primary="Reportes" onClick={handleReporteCompra} />
           </ListItemButton>
         </List>
       </Collapse>
