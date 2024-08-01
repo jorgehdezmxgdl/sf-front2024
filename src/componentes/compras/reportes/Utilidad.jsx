@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Box, Grid, Paper, Typography, Avatar } from '@mui/material';
 import { GridToolbar } from '@mui/x-data-grid';
 import { DataGrid } from '@mui/x-data-grid';
+
+
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { esES } from "@mui/x-data-grid/locales";
 import Filtros from './Filtros';

@@ -24,12 +24,19 @@ import FaceIcon from '@mui/icons-material/Face';
 import RoomPreferencesIcon from '@mui/icons-material/RoomPreferences';
 import DoorFrontIcon from '@mui/icons-material/DoorFront';
 
+import StoreIcon from '@mui/icons-material/Store';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import HistoryIcon from '@mui/icons-material/History';
+import EditRoadIcon from '@mui/icons-material/EditRoad';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import StoreMallDirectoryIcon from '@mui/icons-material/StoreMallDirectory';
 
 export default function Nested(props) {
   const [show, setShow]     = React.useState(0);
 
   const [openCC, setOpenCC] = React.useState(true);
   const [openRH, setOpenRH] = React.useState(true);
+  const [openIV, setOpenIV] = React.useState(true);
 
   const handleClickCompras = () => {
     setOpenCC(!openCC);
@@ -38,6 +45,10 @@ export default function Nested(props) {
   const handleClickRH = () => {
       setOpenRH(!openRH); 
   };
+
+  const handleClickIV = () => {
+    setOpenIV(!openIV); 
+};
 
   const handleHR_Personal = () => {
       props.handleShow(1);
@@ -70,6 +81,10 @@ export default function Nested(props) {
 
   const handleReporteCompra = () => {
     props.handleShow(9);
+  }
+
+  const handleInventario01 = (numero) => {
+    props.handleShow(numero);
   }
   
   return (
@@ -158,6 +173,68 @@ export default function Nested(props) {
           </ListItemButton>
         </List>
       </Collapse>
+
+
+      <ListItemButton onClick={handleClickIV}>
+        <ListItemIcon>
+          <StoreMallDirectoryIcon />
+        </ListItemIcon>
+        <ListItemText primary="Inventario" />
+        {openIV ? <ExpandLess /> : <ExpandMore />}
+      </ListItemButton>
+      <Collapse in={openIV} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <ListItemIcon>
+              <StoreIcon />
+            </ListItemIcon>
+            <ListItemText primary="Inventario por almacenes" onClick={() => handleInventario01(11)}  />
+          </ListItemButton>
+        </List>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <ListItemIcon>
+              <AccountTreeIcon />
+            </ListItemIcon>
+            <ListItemText primary="Ajustes de inventario"  onClick={() => handleInventario01(12)}/>
+          </ListItemButton>
+        </List>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <ListItemIcon>
+              <HistoryIcon />
+            </ListItemIcon>
+            <ListItemText primary="Kardex" onClick={() => handleInventario01(13)} />
+          </ListItemButton>
+        </List>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <ListItemIcon>
+              <EditRoadIcon />
+            </ListItemIcon>
+            <ListItemText primary="Localidades" onClick={() => handleInventario01(14)}/>
+          </ListItemButton>
+        </List>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <ListItemIcon>
+              <AssignmentIcon />
+            </ListItemIcon>
+            <ListItemText primary="Inventario General"  onClick={() => handleInventario01(15)}/>
+          </ListItemButton>
+        </List>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <ListItemIcon>
+              <StackedLineChartIcon />
+            </ListItemIcon>
+            <ListItemText primary="Reportes" onClick={() => handleInventario01(16)} />
+          </ListItemButton>
+        </List>
+      </Collapse>
+
+
+
       <ListItemButton onClick={handleClickRH}>
         <ListItemIcon>
           <BusinessIcon />

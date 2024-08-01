@@ -24,6 +24,12 @@ import DataGeneral from "./DataGeneral";
 import Licitaciones from "../compras/Licitaciones";
 import Reportes from '../compras/Reportes';
 import Principal from "./Principal";
+import InventarioAlmacen from "../inventario/almacenes";
+import InventoryManagement from "../inventario/ajustes";
+import Kardex from "../inventario/kardex";
+import StorageBlocks from "../inventario/localidades";
+import PerfumeInventoryOverview from "../inventario/InvGeneral";
+import InventoryDashboard from "../inventario/Graficos";
 
 const drawerWidth = 240;
 
@@ -41,7 +47,13 @@ export default function App() {
     6: Compra,
     7: Visor,
     8: Licitaciones,
-    9: Reportes 
+    9: Reportes,
+    11: InventarioAlmacen, 
+    12: InventoryManagement,
+    13: Kardex,
+    14: StorageBlocks,
+    15: PerfumeInventoryOverview,
+    16: InventoryDashboard
   };
 
   const toggleDrawer = () => {
@@ -63,7 +75,6 @@ export default function App() {
 
 
   return (
-    /*
     <div style={{ display: "flex", height: "100vh" }}>
       <CssBaseline />
       <AppBar
@@ -116,7 +127,5 @@ export default function App() {
         {ComponentToShow ? <ComponentToShow /> : null}
       </Box>
     </div>
-    */
-   <Principal />
   );
 }
